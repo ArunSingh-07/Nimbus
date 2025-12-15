@@ -39,7 +39,15 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <div className="flex flex-col min-h-screen">
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              />
+              <div className="flex-1">{children}</div>
+            </div>
           </ThemeProvider>
         </body>
       </html>
