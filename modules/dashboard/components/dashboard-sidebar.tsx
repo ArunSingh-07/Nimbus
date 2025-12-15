@@ -64,7 +64,7 @@ export function DashboardSidebar({
 }) {
   const pathname = usePathname();
   const [starredPlaygrounds, setStarredPlaygrounds] = useState(
-    initialPlaygroundData.filter((p) => p.starred)
+    initialPlaygroundData?.filter((p) => p.starred)
   );
   const [recentPlaygrounds, setRecentPlaygrounds] = useState(
     initialPlaygroundData
