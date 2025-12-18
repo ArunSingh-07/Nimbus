@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 interface PLaygroundData {
   id: string;
-  name?: string;
+  title?: string;
   [key: string]: any;
 }
 
