@@ -21,7 +21,7 @@ interface FileExplorerState {
   setTemplateData: (data: TemplateFolder | null) => void;
   setEditorContent: (content: string) => void;
   setOpenFiles: (files: OpenFile[]) => void;
-  setActiveFileId: (fileId: string | null) => null;
+  setActiveFileId: (fileId: string | null) => void;
 
   //   funtions
 
