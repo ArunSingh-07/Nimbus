@@ -1,13 +1,35 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
+import dynamic from "next/dynamic";
 
 import { transformToWebContainerFormat } from "../hooks/transformer";
-import { CheckCircle, Loader2, XCircle } from "lucide-react";
+import { CheckCircle, Loader2, XCircle, Terminal } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 import { WebContainer } from "@webcontainer/api";
 import { TemplateFolder } from "@/modules/playground/lib/path-to-json";
-// import TerminalComponent from "./terminal";
+
+// Dynamically import TerminalComponent with SSR disabled
+const TerminalComponent = dynamic(() => import("./terminal"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex flex-col h-full bg-background border rounded-lg overflow-hidden">
+      <div className="flex items-center justify-between px-3 py-2 border-b bg-muted/50">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1">
+            <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+            <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+            <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+          </div>
+          <span className="text-sm font-medium">Loading terminal...</span>
+        </div>
+      </div>
+      <div className="flex-1 flex items-center justify-center">
+        <Terminal className="h-8 w-8 text-muted-foreground animate-pulse" />
+      </div>
+    </div>
+  ),
+});
 
 interface WebContainerPreviewProps {
   templateData: TemplateFolder;
@@ -16,8 +38,9 @@ interface WebContainerPreviewProps {
   error: string | null;
   instance: WebContainer | null;
   writeFileSync: (path: string, content: string) => Promise<void>;
-  forceResetup?: boolean; // Optional prop to force re-setup
+  forceResetup?: boolean;
 }
+
 const WebContainerPreview = ({
   templateData,
   error,
@@ -272,6 +295,7 @@ const WebContainerPreview = ({
       </div>
     );
   }
+
   const getStepIcon = (stepIndex: number) => {
     if (stepIndex < currentStep) {
       return <CheckCircle className="h-5 w-5 text-green-500" />;
@@ -333,12 +357,12 @@ const WebContainerPreview = ({
 
           {/* Terminal */}
           <div className="flex-1 p-4">
-            {/* <TerminalComponent
+            <TerminalComponent
               ref={terminalRef}
               webContainerInstance={instance}
               theme="dark"
               className="h-full"
-            /> */}
+            />
           </div>
         </div>
       ) : (
@@ -352,12 +376,12 @@ const WebContainerPreview = ({
           </div>
 
           <div className="h-64 border-t">
-            {/* <TerminalComponent
+            <TerminalComponent
               ref={terminalRef}
               webContainerInstance={instance}
               theme="dark"
               className="h-full"
-            /> */}
+            />
           </div>
         </div>
       )}
