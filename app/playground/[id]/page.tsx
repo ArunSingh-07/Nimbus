@@ -22,7 +22,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import PlaygroundEditor from "@/modules/playground/components/playground-editor";
-// import LoadingStep from "@/modules/playground/components/loader";
+import LoadingStep from "@/modules/playground/components/loader";
 import { TemplateFileTree } from "@/modules/playground/components/playground-explorer";
 // import ToggleAI from "@/modules/playground/components/toggle-ai";
 // import { useAISuggestions } from "@/modules/playground/hooks/useAISuggestion";
@@ -317,17 +317,17 @@ const MainPlaygroundPage = () => {
             Loading Playground
           </h2>
           <div className="mb-8">
-            {/* <LoadingStep
+            <LoadingStep
               currentStep={1}
               step={1}
               label="Loading playground data"
-            /> */}
-            {/* <LoadingStep
+            />
+            <LoadingStep
               currentStep={2}
               step={2}
               label="Setting up environment"
-            /> */}
-            {/* <LoadingStep currentStep={3} step={3} label="Ready to code" /> */}
+            />
+            <LoadingStep currentStep={3} step={3} label="Ready to code" />
           </div>
         </div>
       </div>
@@ -382,7 +382,7 @@ const MainPlaygroundPage = () => {
 
               <div className="flex items-center gap-1">
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Button
                       size="sm"
                       variant="outline"

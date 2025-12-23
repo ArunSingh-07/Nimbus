@@ -2,6 +2,10 @@ import { TemplateFolder } from "@/modules/playground/lib/path-to-json";
 import { WebContainer } from "@webcontainer/api";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+// Global singleton tracker to survive React Strict Mode unmount/remount cycles
+let webcontainerInstancePromise: Promise<WebContainer> | null = null;
+let teardownTimeout: NodeJS.Timeout | null = null;
+
 interface UseWebContainerProps {
   templateData: TemplateFolder | null;
 }
@@ -26,20 +30,34 @@ export const useWebContainer = ({
 
   useEffect(() => {
     let mount = true;
+
+    // Clear any pending teardown to handle React Strict Mode double-mount
+    if (teardownTimeout) {
+      clearTimeout(teardownTimeout);
+      teardownTimeout = null;
+    }
+
     async function initializeWebContainer() {
       try {
-        const webcontainerInstance = await WebContainer.boot();
+        // If no boot promise exists, create one
+        if (!webcontainerInstancePromise) {
+          webcontainerInstancePromise = WebContainer.boot();
+        }
+
+        const webcontainerInstance = await webcontainerInstancePromise;
 
         if (!mount) {
-          webcontainerInstance.teardown();
+          // If unmounted, we don't immediately teardown here relying on the cleanup function's debounce
           return;
         }
-        
-        webcontainerRef.current = webcontainerInstance;
+
         setInstance(webcontainerInstance); // Keeping state for UI updates
         setIsLoading(false);
       } catch (error) {
         console.error("Failed to initialize WebContainer: ", error);
+        // If boot failed, clear the promise so we can try again
+        webcontainerInstancePromise = null;
+        
         if (mount) {
           setError(
             error instanceof Error
@@ -55,9 +73,21 @@ export const useWebContainer = ({
 
     return () => {
       mount = false;
-      if (webcontainerRef.current) {
-        webcontainerRef.current.teardown();
-        webcontainerRef.current = null;
+      
+      // Schedule teardown with a delay to allow for immediate remounting (Strict Mode / Hot Reload)
+      if (!teardownTimeout) {
+        teardownTimeout = setTimeout(async () => {
+          if (webcontainerInstancePromise) {
+            try {
+              const instance = await webcontainerInstancePromise;
+              instance.teardown();
+            } catch (e) {
+              console.error("Error tearing down WebContainer:", e);
+            }
+            webcontainerInstancePromise = null;
+            teardownTimeout = null;
+          }
+        }, 500); // 500ms grace period
       }
     };
   }, []);
