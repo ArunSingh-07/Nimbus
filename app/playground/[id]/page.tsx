@@ -24,7 +24,7 @@ import {
 import PlaygroundEditor from "@/modules/playground/components/playground-editor";
 import LoadingStep from "@/modules/playground/components/loader";
 import { TemplateFileTree } from "@/modules/playground/components/playground-explorer";
-// import ToggleAI from "@/modules/playground/components/toggle-ai";
+import ToggleAI from "@/modules/playground/components/toggle-ai";
 // import { useAISuggestions } from "@/modules/playground/hooks/useAISuggestion";
 import { useFileExplorer } from "@/modules/playground/hooks/useFileExplorer";
 import { usePlayground } from "@/modules/playground/hooks/usePlayground";
@@ -409,11 +409,14 @@ const MainPlaygroundPage = () => {
                   <TooltipContent>Save All (Ctrl+Shift+S)</TooltipContent>
                 </Tooltip>
 
-                {/* <ToggleAI
-                  isEnabled={aiSuggestions.isEnabled}
-                  onToggle={aiSuggestions.toggleEnabled}
-                  suggestionLoading={aiSuggestions.isLoading}
-                /> */}
+                <ToggleAI
+                  isEnabled={false}
+                  onToggle={() => {}}
+                  suggestionLoading={true}
+                  // isEnabled={aiSuggestions.isEnabled}
+                  // onToggle={aiSuggestions.toggleEnabled}
+                  // suggestionLoading={aiSuggestions.isLoading}
+                />
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
