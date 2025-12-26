@@ -24,7 +24,7 @@ import {
 import PlaygroundEditor from "@/modules/playground/components/playground-editor";
 import LoadingStep from "@/modules/playground/components/loader";
 import { TemplateFileTree } from "@/modules/playground/components/playground-explorer";
-import ToggleAI from "@/modules/playground/components/toggle-ai";
+import ToggleAI from "@/modules/playground/components/toggle-AI";
 // import { useAISuggestions } from "@/modules/playground/hooks/useAISuggestion";
 import { useFileExplorer } from "@/modules/playground/hooks/useFileExplorer";
 import { usePlayground } from "@/modules/playground/hooks/usePlayground";
