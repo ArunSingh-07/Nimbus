@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 interface CodeSuggestionRequest {
   fileContent: string;
@@ -12,8 +12,8 @@ interface CodeContext {
   language: string;
   framework: string;
   beforeContext: string;
-  afterContext: string;
   currentLine: string;
+  afterContext: string;
   cursorPosition: { line: number; column: number };
   isInFunction: boolean;
   isInClass: boolean;
@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
     const { fileContent, cursorLine, cursorColumn, suggestionType, fileName } =
       body;
 
+    // Validate input
     if (!fileContent || cursorLine < 0 || cursorColumn < 0 || !suggestionType) {
       return NextResponse.json(
         { error: "Invalid input parameters" },
@@ -41,9 +42,10 @@ export async function POST(request: NextRequest) {
       cursorColumn,
       fileName
     );
+
     const prompt = buildPrompt(context, suggestionType);
 
-    const suggestion = generateSuggestion(prompt);
+    const suggestion = await generateSuggestion(prompt);
 
     return NextResponse.json({
       suggestion,

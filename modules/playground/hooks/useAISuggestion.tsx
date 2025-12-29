@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
+import { useState, useCallback } from "react";
 
-interface AISUggestionsState {
+interface AISuggestionsState {
   suggestion: string | null;
   isLoading: boolean;
   position: { line: number; column: number } | null;
@@ -8,16 +8,16 @@ interface AISUggestionsState {
   isEnabled: boolean;
 }
 
-interface UseAISuggestionsReturn extends AISUggestionsState {
+interface UseAISuggestionsReturn extends AISuggestionsState {
   toggleEnabled: () => void;
-  fetchSuggestion: (type: string, editor: any) => Promise<any>;
+  fetchSuggestion: (type: string, editor: any) => Promise<void>;
   acceptSuggestion: (editor: any, monaco: any) => void;
   rejectSuggestion: (editor: any) => void;
   clearSuggestion: (editor: any) => void;
 }
 
 export const useAISuggestion = (): UseAISuggestionsReturn => {
-  const [state, setState] = useState<AISUggestionsState>({
+  const [state, setState] = useState<AISuggestionsState>({
     suggestion: null,
     isLoading: false,
     position: null,
@@ -48,30 +48,28 @@ export const useAISuggestion = (): UseAISuggestionsReturn => {
 
       const newState = { ...currentState, isLoading: true };
 
-      async () => {
+      (async () => {
         try {
           const payload = {
             fileContent: model.getValue(),
-            cursorline: cursorPosition.lineNumaber - 1,
-            cursolColumn: cursorPosition.column - 1,
-            suggetstionType: type,
+            cursorLine: cursorPosition.lineNumber - 1,
+            cursorColumn: cursorPosition.column - 1,
+            suggestionType: type,
           };
 
-          const response = await fetch("/api/code/suggestions", {
+          const response = await fetch("/api/code-completion", {
             method: "POST",
-            headers: { "COntent-Type": "application/json" },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
           });
-
           if (!response.ok) {
-            throw new Error(`API response with status${response.status}`);
+            throw new Error(`API responded with status ${response.status}`);
           }
 
           const data = await response.json();
 
-          if (data.suggestion) {
+          if (data.suggestion && typeof data.suggestion === "string") {
             const suggestionText = data.suggestion.trim();
-
             setState((prev) => ({
               ...prev,
               suggestion: suggestionText,
@@ -86,10 +84,11 @@ export const useAISuggestion = (): UseAISuggestionsReturn => {
             setState((prev) => ({ ...prev, isLoading: false }));
           }
         } catch (error) {
-          console.error("Error fetch code suggestion:", error);
+          console.error("Error fetching code suggestion:", error);
           setState((prev) => ({ ...prev, isLoading: false }));
         }
-      };
+      })();
+
       return newState;
     });
   }, []);
@@ -107,7 +106,7 @@ export const useAISuggestion = (): UseAISuggestionsReturn => {
         }
 
         const { line, column } = currentState.position;
-        const sanitizationSuggestion = currentState.suggestion.replace(
+        const sanitizedSuggestion = currentState.suggestion.replace(
           /^\d+:\s*/gm,
           ""
         );
@@ -115,13 +114,13 @@ export const useAISuggestion = (): UseAISuggestionsReturn => {
         editor.executeEdits("", [
           {
             range: new monaco.Range(line, column, line, column),
-            text: sanitizationSuggestion,
+            text: sanitizedSuggestion,
             forceMoveMarkers: true,
           },
         ]);
 
         if (editor && currentState.decoration.length > 0) {
-          editor.deltaDecoration(currentState.decoration, []);
+          editor.deltaDecorations(currentState.decoration, []);
         }
 
         return {
@@ -137,7 +136,7 @@ export const useAISuggestion = (): UseAISuggestionsReturn => {
   const rejectSuggestion = useCallback((editor: any) => {
     setState((currentState) => {
       if (editor && currentState.decoration.length > 0) {
-        editor.deltaDecoration(currentState.decoration, []);
+        editor.deltaDecorations(currentState.decoration, []);
       }
 
       return {
@@ -152,9 +151,8 @@ export const useAISuggestion = (): UseAISuggestionsReturn => {
   const clearSuggestion = useCallback((editor: any) => {
     setState((currentState) => {
       if (editor && currentState.decoration.length > 0) {
-        editor.deltaDecoration(currentState.decoration, []);
+        editor.deltaDecorations(currentState.decoration, []);
       }
-
       return {
         ...currentState,
         suggestion: null,
@@ -166,10 +164,10 @@ export const useAISuggestion = (): UseAISuggestionsReturn => {
 
   return {
     ...state,
-    clearSuggestion,
-    rejectSuggestion,
-    acceptSuggestion,
-    fetchSuggestion,
     toggleEnabled,
+    fetchSuggestion,
+    acceptSuggestion,
+    rejectSuggestion,
+    clearSuggestion,
   };
 };
