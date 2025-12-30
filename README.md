@@ -1,5 +1,7 @@
 # ☁️ Nimbus
 
+> **Note**: This is a personal project created for learning and educational purposes.
+
 **Nimbus** is a powerful, cloud-based Integrated Development Environment (IDE) and coding playground. Built with modern web technologies, it empowers developers to create, edit, and run code directly in the browser using WebContainer technology.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
@@ -86,9 +88,6 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
