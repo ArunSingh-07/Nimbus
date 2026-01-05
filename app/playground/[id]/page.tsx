@@ -53,6 +53,7 @@ import React, {
 } from "react";
 import { toast } from "sonner";
 import { useAISuggestion } from "@/modules/playground/hooks/useAISuggestion";
+import { useModel } from "@/components/model-context";
 
 const MainPlaygroundPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -62,6 +63,9 @@ const MainPlaygroundPage = () => {
     usePlayground(id);
 
   const aiSuggestions = useAISuggestion();
+  
+  // Model selection state from context
+  const { models, selectedModel, setSelectedModel } = useModel();
 
   const {
     setTemplateData,
@@ -409,6 +413,27 @@ const MainPlaygroundPage = () => {
                   <TooltipContent>Save All (Ctrl+Shift+S)</TooltipContent>
                 </Tooltip>
 
+                {/* Model Selector */}
+                {models.length > 0 && (
+                  <div className="flex items-center gap-2 mr-2">
+                     <select 
+                       className="h-8 text-xs bg-background border border-input rounded-md px-2 focus:outline-none focus:ring-1 focus:ring-ring"
+                       value={selectedModel ? `${selectedModel.name}|${selectedModel.source}` : ""}
+                       onChange={(e) => {
+                         const [name, source] = e.target.value.split("|");
+                         const model = models.find(m => m.name === name && m.source === source);
+                         if (model) setSelectedModel(model);
+                       }}
+                     >
+                       {models.map(m => (
+                         <option key={`${m.source}-${m.name}`} value={`${m.name}|${m.source}`}>
+                           {m.name} ({m.source})
+                         </option>
+                       ))}
+                     </select>
+                  </div>
+                )}
+
                 <ToggleAI
                   isEnabled={aiSuggestions.isEnabled}
                   onToggle={aiSuggestions.toggleEnabled}
@@ -510,7 +535,10 @@ const MainPlaygroundPage = () => {
                           aiSuggestions.rejectSuggestion(editor)
                         }
                         onTriggerSuggestion={(type, editor) =>
-                          aiSuggestions.fetchSuggestion(type, editor)
+                          aiSuggestions.fetchSuggestion(type, editor, {
+                            model: selectedModel?.name,
+                            source: selectedModel?.source
+                          })
                         }
                       />
                     </ResizablePanel>

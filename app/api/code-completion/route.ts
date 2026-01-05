@@ -6,6 +6,8 @@ interface CodeSuggestionRequest {
   cursorColumn: number;
   suggestionType: string;
   fileName?: string;
+  model?: string;
+  source?: "local" | "cloud";
 }
 
 interface CodeContext {
@@ -25,8 +27,15 @@ export async function POST(request: NextRequest) {
   try {
     const body: CodeSuggestionRequest = await request.json();
 
-    const { fileContent, cursorLine, cursorColumn, suggestionType, fileName } =
-      body;
+    const { 
+      fileContent, 
+      cursorLine, 
+      cursorColumn, 
+      suggestionType, 
+      fileName,
+      model,
+      source 
+    } = body;
 
     // Validate input
     if (!fileContent || cursorLine < 0 || cursorColumn < 0 || !suggestionType) {
@@ -45,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     const prompt = buildPrompt(context, suggestionType);
 
-    const suggestion = await generateSuggestion(prompt);
+    const suggestion = await generateSuggestion(prompt, model, source);
 
     return NextResponse.json({
       suggestion,
@@ -136,24 +145,40 @@ Instructions:
 Generate suggestion:`;
 }
 
-async function generateSuggestion(prompt: string): Promise<string> {
+async function generateSuggestion(
+  prompt: string, 
+  model: string = "codellama:latest",
+  source: "local" | "cloud" = "local"
+): Promise<string> {
+  const baseUrl = source === "cloud" 
+    ? process.env.OLLAMA_CLOUD_URL 
+    : (process.env.OLLAMA_LOCAL_URL || "http://localhost:11434");
+
+  if (!baseUrl) {
+    console.warn(`Ollama URL not configured for ${source}`);
+    return "// AI suggestion unavailable (Configuration missing)";
+  }
+
   try {
-    const response = await fetch("http://localhost:11434/api/generate", {
+    const response = await fetch(`${baseUrl}/api/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "codellama:latest",
+        model,
         prompt,
         stream: false,
-        option: {
-          temperature: 0.7,
+        options: {
+          temperature: 0.3,
           max_tokens: 300,
+          top_p: 0.9,
         },
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`AI service error: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error("Ollama error response:", errorText);
+      throw new Error(`AI service error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
@@ -166,9 +191,10 @@ async function generateSuggestion(prompt: string): Promise<string> {
     }
 
     return suggestion;
-  } catch (error) {
+  } catch (error: any) {
     console.error("AI generation error:", error);
-    return "// AI suggestion unavailable";
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return `// AI suggestion unavailable: ${errorMessage}`;
   }
 }
 

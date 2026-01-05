@@ -10,7 +10,7 @@ interface AISuggestionsState {
 
 interface UseAISuggestionsReturn extends AISuggestionsState {
   toggleEnabled: () => void;
-  fetchSuggestion: (type: string, editor: any) => Promise<void>;
+  fetchSuggestion: (type: string, editor: any, options?: { model?: string; source?: "local" | "cloud" }) => Promise<void>;
   acceptSuggestion: (editor: any, monaco: any) => void;
   rejectSuggestion: (editor: any) => void;
   clearSuggestion: (editor: any) => void;
@@ -29,7 +29,7 @@ export const useAISuggestion = (): UseAISuggestionsReturn => {
     setState((prev) => ({ ...prev, isEnabled: !prev.isEnabled }));
   }, []);
 
-  const fetchSuggestion = useCallback(async (type: string, editor: any) => {
+  const fetchSuggestion = useCallback(async (type: string, editor: any, options?: { model?: string; source?: "local" | "cloud" }) => {
     setState((currentState) => {
       if (!currentState.isEnabled) {
         return currentState;
@@ -55,6 +55,8 @@ export const useAISuggestion = (): UseAISuggestionsReturn => {
             cursorLine: cursorPosition.lineNumber - 1,
             cursorColumn: cursorPosition.column - 1,
             suggestionType: type,
+            model: options?.model,
+            source: options?.source,
           };
 
           const response = await fetch("/api/code-completion", {

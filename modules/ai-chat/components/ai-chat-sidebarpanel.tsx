@@ -42,6 +42,7 @@ import {
 import "katex/dist/katex.min.css";
 import Image from "next/image";
 import Stream from "stream";
+import { useModel } from "@/components/model-context";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -115,7 +116,8 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
   const [filterType, setFilterType] = useState<string>("all");
   const [autoSave, setAutoSave] = useState(true);
   const [streamResponse, setStreamResponse] = useState(true);
-  const [model, setModel] = useState<string>("gpt-6");
+
+  const { selectedModel, isLoading: isModelLoading, models, setSelectedModel } = useModel();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -124,6 +126,8 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  // Removed local fetching effects as they are handled in ModelContext
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -148,6 +152,12 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
+
+    // ✅ Guard against null
+    if (!selectedModel) {
+      console.warn("Model not selected");
+      return;
+    }
 
     const messageType =
       chatMode === "chat"
@@ -180,13 +190,10 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
         },
         body: JSON.stringify({
           message: contextualMessage,
-          history: messages.slice(-10).map((msg) => ({
-            role: msg.role,
-            content: msg.content,
-          })),
+          history,
+          model: selectedModel.name,
+          source: selectedModel.source,
           stream: streamResponse,
-          mode: chatMode,
-          model,
         }),
       });
 
@@ -379,14 +386,29 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
                   <div className="hidden sm:flex items-center gap-2 text-xs text-zinc-400">
                     <span className="text-zinc-500">Model:</span>
                     <select
-                      value={model}
-                      onChange={(e) => setModel(e.target.value)}
-                      className="bg-zinc-900/60 border border-zinc-800 rounded px-2 py-1 text-zinc-200 focus:outline-none"
+                      value={
+                        selectedModel
+                          ? `${selectedModel.name}|${selectedModel.source}`
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const [name, source] = e.target.value.split("|");
+                        const model = models.find(
+                          (m) => m.name === name && m.source === source
+                        );
+                        if (model && setSelectedModel) setSelectedModel(model);
+                      }}
                     >
-                      <option value="gpt-6">gpt-6</option>
-                      <option value="codellama">codellama</option>
-                      <option value="llama2">llama2</option>
+                      {models.map((model) => (
+                        <option
+                          key={`${model.source}-${model.name}`}
+                          value={`${model.name}|${model.source}`}
+                        >
+                          {model.name} ({model.source})
+                        </option>
+                      ))}
                     </select>
+
                   </div>
                   <div className="relative">
                     <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-zinc-500" />
@@ -504,10 +526,13 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
                           remarkPlugins={[remarkGfm, remarkMath]}
                           rehypePlugins={[rehypeKatex]}
                           components={{
-                            code: ({ children, className, inline }) => {
-                              if (inline) {
+                            code: ({ children, className, ...props }) => {
+                              const match = /language-(\w+)/.exec(className || "");
+                              const isInline = !match && !String(children).includes("\n");
+                              
+                              if (isInline) {
                                 return (
-                                  <code className="bg-zinc-800 px-1 py-0.5 rounded text-sm">
+                                  <code className="bg-zinc-800 px-1 py-0.5 rounded text-sm" {...props}>
                                     {children}
                                   </code>
                                 );
@@ -515,7 +540,7 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
                               return (
                                 <div className="bg-zinc-800 rounded-lg p-4 my-4">
                                   <pre className="text-sm text-zinc-100 overflow-x-auto">
-                                    <code className={className}>
+                                    <code className={className} {...props}>
                                       {children}
                                     </code>
                                   </pre>
@@ -611,7 +636,8 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
                       handleSendMessage(e as any);
                     }
                   }}
@@ -621,7 +647,7 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
                 />
                 <div className="absolute right-3 bottom-3 flex items-center gap-2">
                   <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-xs text-zinc-500 bg-zinc-800 border border-zinc-700 rounded">
-                    ⌘↵
+                    ↵
                   </kbd>
                 </div>
               </div>
