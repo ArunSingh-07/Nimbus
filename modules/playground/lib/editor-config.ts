@@ -223,8 +223,40 @@ export const configureMonaco = (monaco: Monaco) => {
     },
   });
 
-  // Set the theme
-  monaco.editor.setTheme("modern-dark");
+  // One Dark Pro Theme
+  monaco.editor.defineTheme("one-dark-pro", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "5c6370", fontStyle: "italic" },
+      { token: "keyword", foreground: "c678dd" },
+      { token: "string", foreground: "98c379" },
+      { token: "number", foreground: "d19a66" },
+      { token: "type", foreground: "e5c07b" },
+      { token: "class", foreground: "e5c07b" },
+      { token: "function", foreground: "61afef" },
+      { token: "variable", foreground: "abb2bf" },
+      { token: "parameter", foreground: "abb2bf" },
+      { token: "operator", foreground: "56b6c2" },
+      { token: "tag", foreground: "e06c75" },
+      { token: "attribute.name", foreground: "d19a66" },
+      { token: "attribute.value", foreground: "98c379" },
+      { token: "constant", foreground: "d19a66" },
+      { token: "property", foreground: "e06c75" },
+    ],
+    colors: {
+      "editor.background": "#282c34",
+      "editor.foreground": "#abb2bf",
+      "editor.lineHighlightBackground": "#2c313c",
+      "editorCursor.foreground": "#528bff",
+      "editorWhitespace.foreground": "#3b4048",
+      "editorIndentGuide.background": "#3b4048",
+      "editorLineNumber.foreground": "#495162",
+      "editor.selectionBackground": "#3e4451",
+    },
+  });
+
+  // Theme is extracted and controlled by the component now
 
   // Configure additional editor settings
   monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({

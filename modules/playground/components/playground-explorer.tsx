@@ -11,6 +11,7 @@ import {
   MoreHorizontal,
   Trash2,
   Edit3,
+  Settings,
 } from "lucide-react";
 
 import {
@@ -21,6 +22,7 @@ import {
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupAction,
   SidebarGroupContent,
@@ -81,6 +83,7 @@ interface TemplateFileTreeProps {
     newFolderName: string,
     parentPath: string
   ) => void;
+  onSettingsClick?: () => void;
 }
 
 export function TemplateFileTree({
@@ -94,6 +97,7 @@ export function TemplateFileTree({
   onDeleteFolder,
   onRenameFile,
   onRenameFolder,
+  onSettingsClick,
 }: TemplateFileTreeProps) {
   const isRootFolder = data && typeof data === "object" && "folderName" in data;
   const [isNewFileDialogOpen, setIsNewFileDialogOpen] = React.useState(false);
@@ -191,6 +195,16 @@ export function TemplateFileTree({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={onSettingsClick}>
+              <Settings className="h-4 w-4 mr-2" />
+              <span>Settings</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
       <SidebarRail />
 
       <NewFileDialog
