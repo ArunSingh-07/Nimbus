@@ -18,6 +18,8 @@ interface PlaygroundEditorProps {
   onAcceptSuggestion: (editor: any, monaco: any) => void;
   onRejectSuggestion: (editor: any) => void;
   onTriggerSuggestion: (type: string, editor: any) => void;
+  theme?: string;
+  fontFamily?: string;
 }
 
 const PlaygroundEditor = ({
@@ -30,6 +32,8 @@ const PlaygroundEditor = ({
   onAcceptSuggestion,
   onRejectSuggestion,
   onTriggerSuggestion,
+  theme = "modern-dark",
+  fontFamily,
 }: PlaygroundEditorProps) => {
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<Monaco | null>(null);
@@ -287,6 +291,29 @@ const PlaygroundEditor = ({
     );
   }, []);
 
+  useEffect(() => {
+    if (!theme || !monacoRef.current) return;
+
+    try {
+      monacoRef.current.editor.setTheme(theme);
+
+      console.log("Monaco theme set to:", theme);
+    } catch (error) {
+      console.warn("Failed to set Monaco theme:", theme, error);
+    }
+  }, [theme]);
+
+  //font family
+  useEffect(() => {
+    if (!editorRef.current) return;
+
+    editorRef.current.updateOptions({
+      fontFamily: fontFamily ?? "monospace",
+    });
+
+    console.log("Editor font updated:", fontFamily ?? "monospace");
+  }, [fontFamily]);
+
   // Update inline completions when suggestion changes
   useEffect(() => {
     if (!editorRef.current || !monacoRef.current) return;
@@ -357,8 +384,20 @@ const PlaygroundEditor = ({
     monacoRef.current = monaco;
     console.log("Editor instance mounted:", !!editorRef.current);
 
+    if (theme) {
+      monaco.editor.setTheme(theme);
+    }
+
+    const fontOptions = {
+        fontFamily: fontFamily === "cascadia" 
+        ? "'Cascadia Code', monospace" 
+        : defaultEditorOptions.fontFamily,
+        fontLigatures: fontFamily === "cascadia" ? true : defaultEditorOptions.fontLigatures,
+    }
+
     editor.updateOptions({
       ...defaultEditorOptions,
+      ...fontOptions,
       // Enable inline suggestions but with specific settings to prevent conflicts
       inlineSuggest: {
         enabled: true,
@@ -546,6 +585,19 @@ const PlaygroundEditor = ({
     updateEditorLanguage();
   };
 
+  useEffect(() => {
+    if (!editorRef.current) return;
+
+    const fontOptions = {
+        fontFamily: fontFamily === "cascadia" 
+        ? "'Cascadia Code', monospace" 
+        : defaultEditorOptions.fontFamily,
+        fontLigatures: fontFamily === "cascadia" ? true : defaultEditorOptions.fontLigatures,
+    }
+    
+    editorRef.current.updateOptions(fontOptions);
+  }, [fontFamily]);
+
   const updateEditorLanguage = () => {
     if (!activeFile || !monacoRef.current || !editorRef.current) return;
     const model = editorRef.current.getModel();
@@ -603,6 +655,7 @@ const PlaygroundEditor = ({
         value={content}
         onChange={(value) => onContentChange(value || "")}
         onMount={handleEditorDidMount}
+        beforeMount={configureMonaco}
         language={
           activeFile
             ? getEditorLanguage(activeFile.fileExtension || "")

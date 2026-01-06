@@ -4,7 +4,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -34,6 +39,7 @@ import {
 } from "@/modules/playground/lib/path-to-json";
 import WebContainerPreview from "@/modules/webcontainers/components/webcontainer-preview";
 import { useWebContainer } from "@/modules/webcontainers/hooks/useWebcontainer";
+import { SettingsDialog } from "@/modules/playground/components/dialogs/settings-dialog";
 import {
   AlertCircle,
   Bot,
@@ -58,12 +64,56 @@ import { useModel } from "@/components/model-context";
 const MainPlaygroundPage = () => {
   const { id } = useParams<{ id: string }>();
   const [isPreviewVisible, setIsPreviewVisible] = useState(true);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [editorTheme, setEditorTheme] = useState("modern-dark");
+  const [editorFont, setEditorFont] = useState<"default" | "cascadia">("default");
+
+
+  // Fetch user settings on load
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch("/api/user/settings");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.editorTheme) setEditorTheme(data.editorTheme);
+          if (data.editorFont) setEditorFont(data.editorFont);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user settings:", error);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const saveSettings = async (settings: { editorTheme?: string; editorFont?: string }) => {
+    try {
+      await fetch("/api/user/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
+      });
+    } catch (error) {
+      console.error("Failed to save user settings:", error);
+    }
+  };
+
+  const handleThemeChange = (theme: string) => {
+    setEditorTheme(theme);
+    saveSettings({ editorTheme: theme });
+  };
+
+  const handleEditorFontChange = (font: "default" | "cascadia") => {
+    setEditorFont(font);
+    saveSettings({ editorFont: font });
+  };
+
 
   const { playgroundData, templateData, isLoading, error, saveTemplateData } =
     usePlayground(id);
 
   const aiSuggestions = useAISuggestion();
-  
+
   // Model selection state from context
   const { models, selectedModel, setSelectedModel } = useModel();
 
@@ -86,6 +136,8 @@ const MainPlaygroundPage = () => {
     handleRenameFolder,
     updateFileContent,
   } = useFileExplorer();
+
+
 
   const {
     serverUrl,
@@ -353,9 +405,11 @@ const MainPlaygroundPage = () => {
     );
   }
 
+
+
   return (
     <TooltipProvider>
-      <>
+      <div className="contents font-google-sans">
         <TemplateFileTree
           data={templateData!}
           onFileSelect={handleFileSelect}
@@ -367,6 +421,7 @@ const MainPlaygroundPage = () => {
           onDeleteFolder={wrappedHandleDeleteFolder}
           onRenameFile={wrappedHandleRenameFile}
           onRenameFolder={wrappedHandleRenameFolder}
+          onSettingsClick={() => setIsSettingsOpen(true)}
         />
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -416,21 +471,30 @@ const MainPlaygroundPage = () => {
                 {/* Model Selector */}
                 {models.length > 0 && (
                   <div className="flex items-center gap-2 mr-2">
-                     <select 
-                       className="h-8 text-xs bg-background border border-input rounded-md px-2 focus:outline-none focus:ring-1 focus:ring-ring"
-                       value={selectedModel ? `${selectedModel.name}|${selectedModel.source}` : ""}
-                       onChange={(e) => {
-                         const [name, source] = e.target.value.split("|");
-                         const model = models.find(m => m.name === name && m.source === source);
-                         if (model) setSelectedModel(model);
-                       }}
-                     >
-                       {models.map(m => (
-                         <option key={`${m.source}-${m.name}`} value={`${m.name}|${m.source}`}>
-                           {m.name} ({m.source})
-                         </option>
-                       ))}
-                     </select>
+                    <select
+                      className="h-8 text-xs bg-background border border-input rounded-md px-2 focus:outline-none focus:ring-1 focus:ring-ring"
+                      value={
+                        selectedModel
+                          ? `${selectedModel.name}|${selectedModel.source}`
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const [name, source] = e.target.value.split("|");
+                        const model = models.find(
+                          (m) => m.name === name && m.source === source
+                        );
+                        if (model) setSelectedModel(model);
+                      }}
+                    >
+                      {models.map((m) => (
+                        <option
+                          key={`${m.source}-${m.name}`}
+                          value={`${m.name}|${m.source}`}
+                        >
+                          {m.name} ({m.source})
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 )}
 
@@ -451,6 +515,9 @@ const MainPlaygroundPage = () => {
                       onClick={() => setIsPreviewVisible(!isPreviewVisible)}
                     >
                       {isPreviewVisible ? "Hide" : "Show"} Preview
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setIsSettingsOpen(true)}>
+                      Editor Settings
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={closeAllFiles}>
@@ -537,9 +604,11 @@ const MainPlaygroundPage = () => {
                         onTriggerSuggestion={(type, editor) =>
                           aiSuggestions.fetchSuggestion(type, editor, {
                             model: selectedModel?.name,
-                            source: selectedModel?.source
+                            source: selectedModel?.source,
                           })
                         }
+                        theme={editorTheme}
+                        fontFamily={editorFont}
                       />
                     </ResizablePanel>
 
@@ -575,7 +644,15 @@ const MainPlaygroundPage = () => {
             )}
           </div>
         </SidebarInset>
-      </>
+        <SettingsDialog
+          open={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
+          theme={editorTheme}
+          onThemeChange={handleThemeChange}
+          editorFont={editorFont}
+          onEditorFontChange={handleEditorFontChange}
+        />
+      </div>
     </TooltipProvider>
   );
 };
