@@ -97,7 +97,16 @@ const WebContainerPreview = ({
             "utf8"
           );
 
-          if (packageJsonExists) {
+          // Also check if node_modules exists to ensure we don't skip install on broken state
+          let nodeModulesExists = false;
+          try {
+             await instance.fs.readdir("node_modules");
+             nodeModulesExists = true;
+          } catch (e) {
+            nodeModulesExists = false;
+          }
+
+          if (packageJsonExists && nodeModulesExists) {
             // Files are already mounted, just reconnect to existing server
             if (terminalRef.current?.writeToTerminal) {
               terminalRef.current.writeToTerminal(
@@ -209,13 +218,19 @@ const WebContainerPreview = ({
 
         // STEP-4 Start The Server
 
+        // Detect script to run
+        const pkgJSON = await instance.fs.readFile("package.json", "utf-8");
+        const pkg = JSON.parse(pkgJSON);
+        const startScript = pkg.scripts?.start ? "start" : "dev";
+
+
         if (terminalRef.current?.writeToTerminal) {
           terminalRef.current.writeToTerminal(
-            "🚀 Starting development server...\r\n"
+            `🚀 Starting development server with 'npm run ${startScript}'...\r\n`
           );
         }
 
-        const startProcess = await instance.spawn("npm", ["run", "start"]);
+        const startProcess = await instance.spawn("npm", ["run", startScript]);
 
         instance.on("server-ready", (port: number, url: string) => {
           if (terminalRef.current?.writeToTerminal) {

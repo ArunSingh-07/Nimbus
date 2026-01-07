@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-
+import { GoogleGenerativeAI } from "@google/generative-ai";
 interface CodeSuggestionRequest {
   fileContent: string;
   cursorLine: number;
@@ -7,7 +7,7 @@ interface CodeSuggestionRequest {
   suggestionType: string;
   fileName?: string;
   model?: string;
-  source?: "local" | "cloud";
+  source?: "local" | "cloud" | "google";
 }
 
 interface CodeContext {
@@ -27,14 +27,14 @@ export async function POST(request: NextRequest) {
   try {
     const body: CodeSuggestionRequest = await request.json();
 
-    const { 
-      fileContent, 
-      cursorLine, 
-      cursorColumn, 
-      suggestionType, 
+    const {
+      fileContent,
+      cursorLine,
+      cursorColumn,
+      suggestionType,
       fileName,
       model,
-      source 
+      source,
     } = body;
 
     // Validate input
@@ -145,18 +145,64 @@ Instructions:
 Generate suggestion:`;
 }
 
+async function generateGeminiSuggestions(prompt: string, modelName: string) {
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+  /* Retry logic for Gemini */
+  const maxRetries = 3;
+  let attempt = 0;
+  
+  const model = genAI.getGenerativeModel({
+    model: modelName,
+  });
+
+  while (attempt < maxRetries) {
+    try {
+      const result = await model.generateContent(prompt);
+      return result.response.text();
+    } catch (error: any) {
+      if (error.status === 429 && attempt < maxRetries - 1) {
+        attempt++;
+        const delay = Math.pow(2, attempt) * 1000;
+        console.warn(`Gemini Code Completion 429 Rate Limit. Retrying in ${delay}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+      throw error;
+    }
+  }
+  return "// Gemini suggestion unavailable: Rate limit exceeded";
+}
+
 async function generateSuggestion(
-  prompt: string, 
+  prompt: string,
   model: string = "codellama:latest",
-  source: "local" | "cloud" = "local"
+  source: "local" | "cloud" | "google" = "local"
 ): Promise<string> {
-  const baseUrl = source === "cloud" 
-    ? process.env.OLLAMA_CLOUD_URL 
-    : (process.env.OLLAMA_LOCAL_URL || "http://localhost:11434");
+  // 🟢 GOOGLE GEMINI PATH
+  if (source === "google") {
+    if (!process.env.GEMINI_API_KEY) {
+      return "// Gemini API key not configured";
+    }
+
+    const geminiModel = model || "gemini-1.5-flash";
+
+    try {
+      return await generateGeminiSuggestions(prompt, geminiModel);
+    } catch (error: any) {
+      console.error("Gemini error:", error);
+      return `// Gemini suggestion unavailable: ${error.message}`;
+    }
+  }
+
+  // 🟡 OLLAMA PATH (LOCAL / CLOUD)
+  const baseUrl =
+    source === "cloud"
+      ? process.env.OLLAMA_CLOUD_URL
+      : process.env.OLLAMA_LOCAL_URL || "http://localhost:11434";
 
   if (!baseUrl) {
-    console.warn(`Ollama URL not configured for ${source}`);
-    return "// AI suggestion unavailable (Configuration missing)";
+    return "// AI suggestion unavailable (Ollama URL not configured)";
   }
 
   try {
@@ -164,12 +210,12 @@ async function generateSuggestion(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model,
+        model: model || "codellama:latest",
         prompt,
         stream: false,
         options: {
           temperature: 0.3,
-          max_tokens: 300,
+          num_predict: 300,
           top_p: 0.9,
         },
       }),
@@ -177,27 +223,24 @@ async function generateSuggestion(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Ollama error response:", errorText);
-      throw new Error(`AI service error: ${response.status} ${response.statusText} - ${errorText}`);
+      throw new Error(errorText);
     }
 
     const data = await response.json();
-    let suggestion = data.response;
+    let suggestion = data.response || "";
 
-    // Clean up the suggestion
+    // Clean markdown fences
     if (suggestion.includes("```")) {
-      const codeMatch = suggestion.match(/```[\w]*\n?([\s\S]*?)```/);
-      suggestion = codeMatch ? codeMatch[1].trim() : suggestion;
+      const match = suggestion.match(/```[\w]*\n?([\s\S]*?)```/);
+      suggestion = match ? match[1].trim() : suggestion;
     }
 
     return suggestion;
   } catch (error: any) {
-    console.error("AI generation error:", error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return `// AI suggestion unavailable: ${errorMessage}`;
+    console.error("Ollama error:", error);
+    return `// AI suggestion unavailable: ${error.message}`;
   }
 }
-
 // Helper functions for code analysis
 function detectLanguage(content: string, fileName?: string): string {
   if (fileName) {
