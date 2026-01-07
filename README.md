@@ -10,6 +10,15 @@
 
 ## ✨ Key Features
 
+
+-   **🚀 WebContainer Powered**: Run Node.js environments natively in the browser. No remote servers required for execution.
+-   **💻 Full-Featured IDE**: robust code editing with [Monaco Editor](https://microsoft.github.io/monaco-editor/), supporting **Save**, **Close All**, and syntax highlighting.
+-   **🤖 AI Assistance**: Integrated AI chat to help debug, generate code, and answer questions. Supports **Enter to Send**.
+-   **🔐 Secure & Flexible Auth**: Authentication via **NextAuth v5**, supporting secure user sessions and multiple providers.
+-   **🎨 Modern & Accessible UI**: Beautifully designed with **Tailwind CSS**, **Radix UI**, and dark/light mode support.
+-   **📂 Multi-Framework Templates**: Instantly start projects in React, Next.js, Vue, Angular, Express, and Hono.
+-   **⚡ Real-time Previews**: Instantly see your changes with in-browser previews.
+
 - **🚀 WebContainer Powered**: Run Node.js environments natively in the browser. No remote servers required for execution.
 - **💻 Full-Featured IDE**: Robust code editing experience with [Monaco Editor](https://microsoft.github.io/monaco-editor/).
 - **🤖 AI Assistance**:
@@ -29,6 +38,7 @@ Detailed documentation is available in the [`docs/`](docs/) directory:
 - [**Troubleshooting**](docs/troubleshooting.md): Solutions for common errors (Connections, Memory).
 - [**Architecture**](docs/architecture.md): Technical overview of the system.
 
+
 ## 🛠️ Tech Stack
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
@@ -38,6 +48,15 @@ Detailed documentation is available in the [`docs/`](docs/) directory:
 - **State Management**: [Zustand](https://github.com/pmndrs/zustand)
 - **Editor**: [Monaco Editor](https://microsoft.github.io/monaco-editor/)
 - **Runtime**: [WebContainers](https://webcontainers.io/)
+
+## 📚 Documentation
+
+For detailed information, please check our documentation folder:
+
+-   [**Setup Guide**](docs/setup.md): Complete installation and environment configuration.
+-   [**Features**](docs/features.md): In-depth guide to all Nimbus features.
+-   [**Troubleshooting**](docs/troubleshooting.md): Solutions for common issues.
+-   [**Architecture**](docs/architecture.md): Overview of the technical design.
 
 ## 🚀 Getting Started
 

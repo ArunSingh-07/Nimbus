@@ -25,9 +25,22 @@
 2.  Configure your Ollama URLs in `.env.local`:
 
     ```env
+    # Database (MongoDB)
+    DATABASE_URL="mongodb+srv://..."
+
+    # NextAuth.js
+    AUTH_SECRET="your_generated_secret"
+
+    # OAuth Providers (Optional - for GitHub/Google Login)
+    GITHUB_CLIENT_ID=""
+    GITHUB_CLIENT_SECRET=""
+    GOOGLE_CLIENT_ID=""
+    GOOGLE_CLIENT_SECRET=""
+
+    # AI Service Configuration
     # URL for your local Ollama instance (default)
     OLLAMA_LOCAL_URL=http://localhost:11434
-
+    
     # (Optional) URL for a cloud/remote Ollama instance
     OLLAMA_CLOUD_URL=https://your-cloud-instance.com
     ```
