@@ -23,6 +23,21 @@
 2.  Verify the URL in `.env.local` is correct.
 3.  If running in a container, ensure `localhost` refers to the correct host machine.
 
+### Application Fails to Load / WebContainer Error
+
+**Cause**: Your browser may not support WebContainers (e.g., Safari, older browsers) or third-party cookies are blocked.
+**Solution**:
+1.  **Use a supported browser**: Chrome, Edge, or Firefox (latest versions).
+2.  **Enable Third-Party Cookies**: WebContainers require `SharedArrayBuffer` which may be blocked by strict privacy settings or incognito mode.
+3.  **Not Secure Context**: Ensure you are accessing the app via `localhost` or `https`. WebContainers do not work on plain `http` (except localhost).
+
+### Changes are not saving
+
+**Cause**: You might have unsaved changes in the editor that haven't been synchronized.
+**Solution**:
+1.  **Manual Save**: Press `Ctrl + S` or click the "Save" icon in the top right.
+2.  **Check Console**: Open developer tools (F12) to see if there are any network errors preventing the save.
+
 ## Debugging
 
 - **Console Logs**: Check the browser console (F12) and the terminal where `npm run dev` is running for detailed error messages.

@@ -12,6 +12,7 @@ Nimbus uses a **Next.js** App Router architecture with a **Node.js** backend log
     - `AiChatSidebarPanel` (`modules/ai-chat/components/ai-chat-sidebarpanel.tsx`): Handles chat UI, message history, and interaction. Consumes `ModelContext`.
 - **Playground**:
     - `MainPlaygroundPage` (`app/playground/[id]/page.tsx`): Orchestrates the file explorer and editor.
+    - `useWebContainer` (`modules/webcontainers/hooks/useWebcontainer.tsx`): Manages the in-browser Node.js runtime, file system syncing, and terminal processes.
     - `useAISuggestion` (`modules/playground/hooks/useAISuggestion.tsx`): Hook that triggers code completion requests.
 
 ## Backend API
