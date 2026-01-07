@@ -25,6 +25,9 @@ model User {
   staredPlayground StarMark[]
   chatMessages ChatMessage[]
 
+  editorTheme String @default("modern-dark")
+  editorFont String @default("default")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

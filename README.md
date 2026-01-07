@@ -10,6 +10,7 @@
 
 ## ✨ Key Features
 
+
 -   **🚀 WebContainer Powered**: Run Node.js environments natively in the browser. No remote servers required for execution.
 -   **💻 Full-Featured IDE**: robust code editing with [Monaco Editor](https://microsoft.github.io/monaco-editor/), supporting **Save**, **Close All**, and syntax highlighting.
 -   **🤖 AI Assistance**: Integrated AI chat to help debug, generate code, and answer questions. Supports **Enter to Send**.
@@ -18,16 +19,35 @@
 -   **📂 Multi-Framework Templates**: Instantly start projects in React, Next.js, Vue, Angular, Express, and Hono.
 -   **⚡ Real-time Previews**: Instantly see your changes with in-browser previews.
 
+- **🚀 WebContainer Powered**: Run Node.js environments natively in the browser. No remote servers required for execution.
+- **💻 Full-Featured IDE**: Robust code editing experience with [Monaco Editor](https://microsoft.github.io/monaco-editor/).
+- **🤖 AI Assistance**:
+  - **Chat**: Integrated AI chat to help debug and generate code.
+  - **Code Completion**: Real-time inline code suggestions powered by Ollama.
+  - **Multi-Model Support**: Switch seamlessly between Local and Cloud Ollama models.
+- **🔐 Secure & Flexible Auth**: Authentication via **NextAuth v5**.
+- **🎨 Modern UI**: Designed with **Tailwind CSS**, **Radix UI**, and dark/light mode support.
+- **📂 Multi-Framework Templates**: Instantly start projects in React, Next.js, Vue, and more.
+
+## 📚 Documentation
+
+Detailed documentation is available in the [`docs/`](docs/) directory:
+
+- [**Setup Guide**](docs/setup.md): Installation, prerequisites (Ollama), and configuration.
+- [**Features Guide**](docs/features.md): How to use the Chat, Playground, and AI features.
+- [**Troubleshooting**](docs/troubleshooting.md): Solutions for common errors (Connections, Memory).
+- [**Architecture**](docs/architecture.md): Technical overview of the system.
+
+
 ## 🛠️ Tech Stack
 
--   **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
--   **Language**: [TypeScript](https://www.typescriptlang.org/)
--   **Database**: [MongoDB](https://www.mongodb.com/) via [Prisma ORM](https://www.prisma.io/)
--   **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [Radix UI](https://www.radix-ui.com/)
--   **State Management**: [Zustand](https://github.com/pmndrs/zustand)
--   **Editor**: [Monaco Editor](https://microsoft.github.io/monaco-editor/)
--   **Runtime**: [WebContainers](https://webcontainers.io/)
--   **Validation**: [Zod](https://zod.dev/) & [React Hook Form](https://react-hook-form.com/)
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Database**: [MongoDB](https://www.mongodb.com/) via [Prisma ORM](https://www.prisma.io/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [Radix UI](https://www.radix-ui.com/)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Editor**: [Monaco Editor](https://microsoft.github.io/monaco-editor/)
+- **Runtime**: [WebContainers](https://webcontainers.io/)
 
 ## 📚 Documentation
 
@@ -40,63 +60,36 @@ For detailed information, please check our documentation folder:
 
 ## 🚀 Getting Started
 
-Follow these steps to run Nimbus locally.
-
 ### Prerequisites
 
--   **Node.js**: Version 18 or higher is required.
--   **MongoDB**: Ensure you have a MongoDB instance running (local or Atlas).
+- **Node.js**: Version 18 or higher.
+- **Ollama**: Required for AI features. [Download Ollama](https://ollama.com).
 
-### Installation
+### Quick Start
 
-1.  **Clone the repository:**
+1.  **Clone & Install**:
 
     ```bash
     git clone https://github.com/your-username/nimbus.git
     cd nimbus
+    npm install
     ```
 
-2.  **Install dependencies:**
+2.  **Configure Environment**:
+    Create `.env.local` and add your database and Ollama URLs (see [Setup Guide](docs/setup.md) for details):
+
+    ```env
+    # AI Service
+    OLLAMA_LOCAL_URL=http://localhost:11434
+    ```
+
+3.  **Run**:
 
     ```bash
-    npm install
-    # or
-    yarn install
-    # or
-    pnpm install
+    npm run dev
     ```
 
-### Environment Variables
-
-Create a `.env` file in the root directory and add the following variables:
-
-```env
-# Database
-DATABASE_URL="mongodb+srv://..."
-
-# NextAuth
-AUTH_SECRET="your_auth_secret"
-
-# OAuth Providers (Add your specific providers here)
-GITHUB_CLIENT_ID=""
-GITHUB_CLIENT_SECRET=""
-GOOGLE_CLIENT_ID=""
-GOOGLE_CLIENT_SECRET=""
-
-# AI Service (If applicable)
-AI_API_KEY=""
-```
-
-### Run the Application
-
-Start the development server:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
+    Open [http://localhost:3000](http://localhost:3000) to see the app.
 
 ## 📄 License
 

@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 
+type AISource = "local" | "cloud" | "google";
 interface AISuggestionsState {
   suggestion: string | null;
   isLoading: boolean;
@@ -10,7 +11,11 @@ interface AISuggestionsState {
 
 interface UseAISuggestionsReturn extends AISuggestionsState {
   toggleEnabled: () => void;
-  fetchSuggestion: (type: string, editor: any, options?: { model?: string; source?: "local" | "cloud" }) => Promise<void>;
+  fetchSuggestion: (
+    type: string,
+    editor: any,
+    options?: { model?: string; source?: AISource }
+  ) => Promise<void>;
   acceptSuggestion: (editor: any, monaco: any) => void;
   rejectSuggestion: (editor: any) => void;
   clearSuggestion: (editor: any) => void;
@@ -29,71 +34,85 @@ export const useAISuggestion = (): UseAISuggestionsReturn => {
     setState((prev) => ({ ...prev, isEnabled: !prev.isEnabled }));
   }, []);
 
-  const fetchSuggestion = useCallback(async (type: string, editor: any, options?: { model?: string; source?: "local" | "cloud" }) => {
-    setState((currentState) => {
-      if (!currentState.isEnabled) {
-        return currentState;
-      }
+  const fetchSuggestion = useCallback(
+    async (
+      type: string,
+      editor: any,
+      options?: { model?: string; source?: AISource }
+    ) => {
+      setState((currentState) => {
+        if (!currentState.isEnabled) {
+          return currentState;
+        }
 
-      if (!editor) {
-        return currentState;
-      }
+        if (!editor) {
+          return currentState;
+        }
 
-      const model = editor.getModel();
-      const cursorPosition = editor.getPosition();
+        const model = editor.getModel();
+        const cursorPosition = editor.getPosition();
 
-      if (!model || !cursorPosition) {
-        return currentState;
-      }
+        if (!model || !cursorPosition) {
+          return currentState;
+        }
 
-      const newState = { ...currentState, isLoading: true };
+        const newState = { ...currentState, isLoading: true };
 
-      (async () => {
-        try {
-          const payload = {
-            fileContent: model.getValue(),
-            cursorLine: cursorPosition.lineNumber - 1,
-            cursorColumn: cursorPosition.column - 1,
-            suggestionType: type,
-            model: options?.model,
-            source: options?.source,
-          };
+        (async () => {
+          try {
+            const payload = {
+              fileContent: model.getValue(),
+              cursorLine: cursorPosition.lineNumber - 1,
+              cursorColumn: cursorPosition.column - 1,
+              suggestionType: type,
+              model: options?.model,
+              source: options?.source,
+            };
 
-          const response = await fetch("/api/code-completion", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-          if (!response.ok) {
-            throw new Error(`API responded with status ${response.status}`);
-          }
+            const response = await fetch("/api/code-completion", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            if (!response.ok) {
+              throw new Error(`API responded with status ${response.status}`);
+            }
 
-          const data = await response.json();
+            const data = await response.json();
 
-          if (data.suggestion && typeof data.suggestion === "string") {
-            const suggestionText = data.suggestion.trim();
-            setState((prev) => ({
-              ...prev,
-              suggestion: suggestionText,
-              position: {
-                line: cursorPosition.lineNumber,
-                column: cursorPosition.column,
-              },
-              isLoading: false,
-            }));
-          } else {
-            console.warn("No suggestion received from API.");
+            if (data.suggestion && typeof data.suggestion === "string") {
+              const suggestionText = data.suggestion.trim();
+              
+              // Check if the suggestion is actually an error message
+              if (suggestionText.startsWith("//") && suggestionText.includes("unavailable")) {
+                 console.warn("AI Suggestion API returned error:", suggestionText);
+                 setState((prev) => ({ ...prev, isLoading: false }));
+              } else {
+                 setState((prev) => ({
+                  ...prev,
+                  suggestion: suggestionText,
+                  position: {
+                    line: cursorPosition.lineNumber,
+                    column: cursorPosition.column,
+                  },
+                  isLoading: false,
+                }));
+              }
+            } else {
+              console.warn("No suggestion received from API.");
+              setState((prev) => ({ ...prev, isLoading: false }));
+            }
+          } catch (error) {
+            console.error("Error fetching code suggestion:", error);
             setState((prev) => ({ ...prev, isLoading: false }));
           }
-        } catch (error) {
-          console.error("Error fetching code suggestion:", error);
-          setState((prev) => ({ ...prev, isLoading: false }));
-        }
-      })();
+        })();
 
-      return newState;
-    });
-  }, []);
+        return newState;
+      });
+    },
+    []
+  );
 
   const acceptSuggestion = useCallback(() => {
     (editor: any, monaco: any) => {

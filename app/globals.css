@@ -1,5 +1,15 @@
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/cascadia-code@latest/index.css");
+@import url("https://cdn.jsdelivr.net/gh/mortezaom/google-sans-cdn@master/fonts.css");
 @import "tailwindcss";
 @import "tw-animate-css";
+
+.font-cascadia {
+  font-family: "Cascadia Code", monospace;
+}
+
+.font-google-sans {
+  font-family: 'Google Sans', sans-serif;
+}
 
 @custom-variant dark (&:is(.dark *));
 
