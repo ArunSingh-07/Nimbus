@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 export interface ModelOption {
   name: string;
-  source: "local" | "cloud";
+  source: "local" | "cloud" | "google";
   displayName?: string;
 }
 
