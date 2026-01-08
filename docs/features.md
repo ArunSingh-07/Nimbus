@@ -37,3 +37,11 @@ Nimbus supports connecting to multiple Ollama instances and selecting specific m
 - **Local & Cloud**:
     - Models from your local Ollama (`localhost:11434`) are labeled as `(local)`.
     - Models from your cloud instance (configured via `OLLAMA_CLOUD_URL`) are labeled as `(cloud)`.
+
+## Dashboard & Navigation
+
+- **Unified Branding**: Consistent visual identity across the Dashboard and Playground sidebars.
+- **Project Management**:
+    - **Open in New Tab**: All project links now open in a new tab for better multitasking.
+    - **Settings Dropdown**: Access **Settings** and **Log out** directly from the sidebar footer.
+- **Documentation**: Easy access to project documentation via the "Docs" link (redirects to GitHub).
