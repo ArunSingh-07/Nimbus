@@ -12,7 +12,9 @@ import {
   Trash2,
   Edit3,
   Settings,
+  Cloud,
 } from "lucide-react";
+import Link from "next/link";
 
 import {
   Collapsible,
@@ -21,6 +23,7 @@ import {
 } from "@/components/ui/collapsible";
 import {
   Sidebar,
+  SidebarHeader,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
@@ -137,6 +140,16 @@ export function TemplateFileTree({
 
   return (
     <Sidebar>
+      <SidebarHeader>
+        <Link href="/dashboard" className="flex items-center gap-2 px-2 py-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Cloud className="size-4" />
+          </div>
+          <div className="flex flex-col gap-0.5 leading-none">
+            <span className="font-semibold">Nimbus</span>
+          </div>
+        </Link>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>{title}</SidebarGroupLabel>
