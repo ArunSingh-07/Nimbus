@@ -18,9 +18,18 @@ import {
   Terminal,
   Zap,
   Database,
+  LogOut,
   FlameIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { signOut } from "next-auth/react";
 import {
   Sidebar,
   SidebarContent,
@@ -77,7 +86,10 @@ export function DashboardSidebar({
     <Sidebar variant="inset" collapsible="icon" className="border-1 border-r">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-4 py-3 justify-center">
-          <Image src={"/logo.svg"} alt="logo" height={60} width={60} />
+          <Image src={"/logo.svg"} alt="logo" height={40} width={40} />
+          <div className="flex flex-col gap-0.5 leading-none">
+            <span className="font-semibold">Nimbus</span>
+          </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -135,7 +147,10 @@ export function DashboardSidebar({
                         isActive={pathname === `playground/${playground.id}`}
                         tooltip={playground.name}
                       >
-                        <Link href={`playground/${playground.id}`}>
+                        <Link
+                          href={`playground/${playground.id}`}
+                          target="_blank"
+                        >
                           {IconComponent && (
                             <IconComponent className="h-4 w-4" />
                           )}
@@ -172,7 +187,10 @@ export function DashboardSidebar({
                           isActive={pathname === `playground/${playground.id}`}
                           tooltip={playground.name}
                         >
-                          <Link href={`playground/${playground.id}`}>
+                          <Link
+                            href={`playground/${playground.id}`}
+                            target="_blank"
+                          >
                             {IconComponent && (
                               <IconComponent className="h-4 w-4" />
                             )}
@@ -199,12 +217,34 @@ export function DashboardSidebar({
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Settings">
-              <Link href="/dashboard/settings">
-                <Settings className="h-4 w-4" />
-                <span>Settings</span>
-              </Link>
-            </SidebarMenuButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton tooltip="Settings">
+                  <Settings className="h-4 w-4" />
+                  <span>Settings</span>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                align="start"
+                className="w-48"
+              >
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/settings" className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => signOut()}
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

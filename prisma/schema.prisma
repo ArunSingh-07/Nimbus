@@ -27,6 +27,7 @@ model User {
 
   editorTheme String @default("modern-dark")
   editorFont String @default("default")
+  useColoredIcons Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
