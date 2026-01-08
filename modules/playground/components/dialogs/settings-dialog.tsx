@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Palette, Type } from "lucide-react";
 
 interface SettingsDialogProps {
@@ -26,6 +27,8 @@ interface SettingsDialogProps {
 
   editorFont: "default" | "cascadia";
   onEditorFontChange: (font: "default" | "cascadia") => void;
+  useColoredIcons: boolean;
+  onColoredIconsChange: (colored: boolean) => void;
 }
 
 export function SettingsDialog({
@@ -36,6 +39,8 @@ export function SettingsDialog({
 
   editorFont,
   onEditorFontChange,
+  useColoredIcons,
+  onColoredIconsChange,
 }: SettingsDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -99,6 +104,26 @@ export function SettingsDialog({
                 <SelectItem value="cascadia">Cascadia Code</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Icon Theme */}
+          <div className="flex items-center justify-between space-x-4">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center justify-center w-5 h-5">
+                <div className="w-4 h-4 rounded-sm bg-gradient-to-br from-blue-500 to-purple-500" />
+              </div>
+              <div className="flex flex-col space-y-1">
+                <Label>Colored Icons</Label>
+                <span className="text-xs text-muted-foreground">
+                  Show file icons in color
+                </span>
+              </div>
+            </div>
+            
+            <Switch
+              checked={useColoredIcons}
+              onCheckedChange={onColoredIconsChange}
+            />
           </div>
 
 

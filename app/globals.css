@@ -3,12 +3,16 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+svg {
+  color: var(--icon-color, currentColor);
+}
+
 .font-cascadia {
   font-family: "Cascadia Code", monospace;
 }
 
 .font-google-sans {
-  font-family: 'Google Sans', sans-serif;
+  font-family: "Google Sans", sans-serif;
 }
 
 @custom-variant dark (&:is(.dark *));

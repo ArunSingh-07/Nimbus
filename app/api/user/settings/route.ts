@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
       select: {
         editorTheme: true,
         editorFont: true,
+       
       },
     });
 
@@ -44,7 +45,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { editorTheme, editorFont } = body;
+    const { editorTheme, editorFont, useColoredIcons } = body;
 
     // Validation
     if (

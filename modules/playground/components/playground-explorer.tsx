@@ -15,6 +15,7 @@ import {
   Cloud,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 import {
   Collapsible,
@@ -51,6 +52,9 @@ import NewFolderDialog from "./dialogs/new-folder-dialog";
 import NewFileDialog from "./dialogs/new-file-dialog";
 import RenameFileDialog from "./dialogs/rename-file-dialog";
 import { DeleteDialog } from "./dialogs/delete-dialog";
+import { FileIcon } from "./file-icon";
+import { FolderIcon } from "./folder-icon";
+
 // import {TemplateFile} from "../lib/path-to-json"
 
 interface TemplateFile {
@@ -87,6 +91,7 @@ interface TemplateFileTreeProps {
     parentPath: string
   ) => void;
   onSettingsClick?: () => void;
+  coloredIcons?: boolean;
 }
 
 export function TemplateFileTree({
@@ -101,6 +106,7 @@ export function TemplateFileTree({
   onRenameFile,
   onRenameFolder,
   onSettingsClick,
+  coloredIcons = true,
 }: TemplateFileTreeProps) {
   const isRootFolder = data && typeof data === "object" && "folderName" in data;
   const [isNewFileDialogOpen, setIsNewFileDialogOpen] = React.useState(false);
@@ -142,9 +148,7 @@ export function TemplateFileTree({
     <Sidebar>
       <SidebarHeader>
         <Link href="/dashboard" className="flex items-center gap-2 px-2 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Cloud className="size-4" />
-          </div>
+          <Image src="/logo.svg" alt="logo" height={40} width={40} />
           <div className="flex flex-col gap-0.5 leading-none">
             <span className="font-semibold">Nimbus</span>
           </div>
@@ -187,6 +191,7 @@ export function TemplateFileTree({
                     onDeleteFolder={onDeleteFolder}
                     onRenameFile={onRenameFile}
                     onRenameFolder={onRenameFolder}
+                    coloredIcons={coloredIcons}
                   />
                 ))
               ) : (
@@ -202,6 +207,7 @@ export function TemplateFileTree({
                   onDeleteFolder={onDeleteFolder}
                   onRenameFile={onRenameFile}
                   onRenameFolder={onRenameFolder}
+                  coloredIcons={coloredIcons}
                 />
               )}
             </SidebarMenu>
@@ -256,6 +262,7 @@ interface TemplateNodeProps {
     newFolderName: string,
     parentPath: string
   ) => void;
+  coloredIcons?: boolean;
 }
 
 function TemplateNode({
@@ -270,6 +277,7 @@ function TemplateNode({
   onDeleteFolder,
   onRenameFile,
   onRenameFolder,
+  coloredIcons = true,
 }: TemplateNodeProps) {
   const isValidItem = item && typeof item === "object";
   const isFolder = isValidItem && "folderName" in item;
@@ -317,7 +325,7 @@ function TemplateNode({
             onClick={() => onFileSelect?.(file)}
             className="flex-1"
           >
-            <File className="h-4 w-4 mr-2 shrink-0" />
+            <FileIcon filename={fileName} className="h-4 w-4 mr-2 shrink-0" colored={coloredIcons} />
             <span>{fileName}</span>
           </SidebarMenuButton>
 
@@ -433,7 +441,12 @@ function TemplateNode({
             <CollapsibleTrigger asChild>
               <SidebarMenuButton className="flex-1">
                 <ChevronRight className="transition-transform" />
-                <Folder className="h-4 w-4 mr-2 shrink-0" />
+                <FolderIcon
+                  folderName={folderName}
+                  isOpen={isOpen}
+                  className="h-4 w-4 mr-2 shrink-0"
+                  colored={coloredIcons}
+                />
                 <span>{folderName}</span>
               </SidebarMenuButton>
             </CollapsibleTrigger>
@@ -490,6 +503,7 @@ function TemplateNode({
                   onDeleteFolder={onDeleteFolder}
                   onRenameFile={onRenameFile}
                   onRenameFolder={onRenameFolder}
+                  coloredIcons={coloredIcons}
                 />
               ))}
             </SidebarMenuSub>

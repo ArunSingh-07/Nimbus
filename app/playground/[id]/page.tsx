@@ -67,6 +67,7 @@ const MainPlaygroundPage = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editorTheme, setEditorTheme] = useState("modern-dark");
   const [editorFont, setEditorFont] = useState<"default" | "cascadia">("default");
+  const [useColoredIcons, setUseColoredIcons] = useState(true);
 
 
   // Fetch user settings on load
@@ -78,6 +79,7 @@ const MainPlaygroundPage = () => {
           const data = await res.json();
           if (data.editorTheme) setEditorTheme(data.editorTheme);
           if (data.editorFont) setEditorFont(data.editorFont);
+          if (data.useColoredIcons !== undefined) setUseColoredIcons(data.useColoredIcons);
         }
       } catch (error) {
         console.error("Failed to fetch user settings:", error);
@@ -86,7 +88,7 @@ const MainPlaygroundPage = () => {
     fetchSettings();
   }, []);
 
-  const saveSettings = async (settings: { editorTheme?: string; editorFont?: string }) => {
+  const saveSettings = async (settings: { editorTheme?: string; editorFont?: string; useColoredIcons?: boolean }) => {
     try {
       await fetch("/api/user/settings", {
         method: "PUT",
@@ -106,6 +108,11 @@ const MainPlaygroundPage = () => {
   const handleEditorFontChange = (font: "default" | "cascadia") => {
     setEditorFont(font);
     saveSettings({ editorFont: font });
+  };
+
+  const handleColoredIconsChange = (colored: boolean) => {
+    setUseColoredIcons(colored);
+    saveSettings({ useColoredIcons: colored });
   };
 
 
@@ -422,6 +429,7 @@ const MainPlaygroundPage = () => {
           onRenameFile={wrappedHandleRenameFile}
           onRenameFolder={wrappedHandleRenameFolder}
           onSettingsClick={() => setIsSettingsOpen(true)}
+          coloredIcons={useColoredIcons}
         />
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -651,6 +659,8 @@ const MainPlaygroundPage = () => {
           onThemeChange={handleThemeChange}
           editorFont={editorFont}
           onEditorFontChange={handleEditorFontChange}
+          useColoredIcons={useColoredIcons}
+          onColoredIconsChange={handleColoredIconsChange}
         />
       </div>
     </TooltipProvider>
