@@ -33,9 +33,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+
   SidebarRail,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
+import { AllPlaygroundsDialog } from "./dialogs/all-playgrounds-dialog";
 
 // Define the interface for a single playground item, icon is now a string
 interface PlaygroundData {
@@ -69,6 +71,7 @@ export function DashboardSidebar({
   const [recentPlaygrounds, setRecentPlaygrounds] = useState(
     initialPlaygroundData
   );
+  const [isAllPlaygroundsOpen, setIsAllPlaygroundsOpen] = useState(false);
 
   return (
     <Sidebar variant="inset" collapsible="icon" className="border-1 border-r">
@@ -180,12 +183,13 @@ export function DashboardSidebar({
                     );
                   })}
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="View all">
-                  <Link href="/playgrounds">
-                    <span className="text-sm text-muted-foreground">
-                      View all playgrounds
-                    </span>
-                  </Link>
+                <SidebarMenuButton 
+                  tooltip="View all"
+                  onClick={() => setIsAllPlaygroundsOpen(true)}
+                >
+                  <span className="flex items-center gap-2">
+                     <span className="text-sm text-muted-foreground">View all playgrounds</span>
+                  </span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -196,7 +200,7 @@ export function DashboardSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="Settings">
-              <Link href="/settings">
+              <Link href="/dashboard/settings">
                 <Settings className="h-4 w-4" />
                 <span>Settings</span>
               </Link>
@@ -205,6 +209,11 @@ export function DashboardSidebar({
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
+      <AllPlaygroundsDialog 
+        open={isAllPlaygroundsOpen} 
+        onOpenChange={setIsAllPlaygroundsOpen}
+        playgrounds={initialPlaygroundData || []} 
+      />
     </Sidebar>
   );
 }
