@@ -26,7 +26,7 @@
   - **Code Completion**: Real-time inline code suggestions powered by Ollama.
   - **Multi-Model Support**: Switch seamlessly between Local and Cloud Ollama models.
 - **🔐 Secure & Flexible Auth**: Authentication via **NextAuth v5**.
-- **🎨 Modern UI**: Designed with **Tailwind CSS**, **Radix UI**, and dark/light mode support.
+- **🎨 Modern UI**: Beautifully designed with **Tailwind CSS**, featuring consistent branding across dashboards and playgrounds, and intuitive navigation.
 - **📂 Multi-Framework Templates**: Instantly start projects in React, Next.js, Vue, and more.
 
 ## 📚 Documentation
