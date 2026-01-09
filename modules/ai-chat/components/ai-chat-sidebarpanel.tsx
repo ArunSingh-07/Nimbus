@@ -386,6 +386,7 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
                   <div className="hidden sm:flex items-center gap-2 text-xs text-zinc-400">
                     <span className="text-zinc-500">Model:</span>
                     <select
+                      className="bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-md text-xs py-1 px-2 focus:outline-none focus:ring-1 focus:ring-zinc-600 max-w-[150px] cursor-pointer"
                       value={
                         selectedModel
                           ? `${selectedModel.name}|${selectedModel.source}`
@@ -482,7 +483,7 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
                       <button
                         key={suggestion}
                         onClick={() => setInput(suggestion)}
-                        className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm text-zinc-300 transition-colors text-left"
+                        className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm text-zinc-300 transition-colors text-left cursor-pointer"
                       >
                         {suggestion}
                       </button>
