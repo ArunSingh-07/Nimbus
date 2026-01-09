@@ -19,6 +19,11 @@ import {
 import { Laptop, Moon, Palette, Sun, Type } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Settings - Nimbus",
+};
 
 export default function SettingsPage() {
   const { setTheme, theme } = useTheme();

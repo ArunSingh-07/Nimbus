@@ -10,6 +10,12 @@ import EmptyState from "@/modules/dashboard/components/empty-state";
 import ProjectTable from "@/modules/dashboard/components/project-table";
 import React from "react";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard - Nimbus",
+};
+
 const Page = async () => {
   const playgrounds = await getAllPlaygroundForUser();
 
