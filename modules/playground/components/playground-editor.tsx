@@ -429,9 +429,7 @@ const PlaygroundEditor = ({
     });
 
     // CRITICAL: Override Tab key with high priority and prevent default Monaco behavior
-    if (tabCommandRef.current) {
-      tabCommandRef.current.dispose();
-    }
+
 
     tabCommandRef.current = editor.addCommand(
       monaco.KeyCode.Tab,
@@ -625,10 +623,7 @@ const PlaygroundEditor = ({
         inlineCompletionProviderRef.current.dispose();
         inlineCompletionProviderRef.current = null;
       }
-      if (tabCommandRef.current) {
-        tabCommandRef.current.dispose();
-        tabCommandRef.current = null;
-      }
+
     };
   }, []);
 
