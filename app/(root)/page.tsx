@@ -3,6 +3,12 @@ import { cn } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Home",
+};
+
 export default function Home() {
   return (
     <div className=" z-20 flex flex-col items-center justify-start min-h-screen py-2 mt-10">
