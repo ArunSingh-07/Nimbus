@@ -153,7 +153,7 @@ export const duplicateProjectById = async (id: string) => {
     });
 
     revalidatePath("/dashboard");
-    return deleteProjectById;
+    return;
   } catch (error) {
     console.log(error);
     console.error("Error while duplicating Playground");
