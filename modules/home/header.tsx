@@ -1,8 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Button } from "@/components/ui/button";
-import { ArrowUpRight } from "lucide-react";
+import UserButton from "../auth/components/user-button";
 
 export function Header() {
   return (
@@ -61,7 +60,7 @@ export function Header() {
                                         >
                                             Pricing
                                         </Link> */}
-                    {/* <Link
+                    <Link
                       href="https://codesnippetui.pro/templates?utm_source=codesnippetui.com&utm_medium=header"
                       target="_blank"
                       className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors flex items-center gap-2"
@@ -70,7 +69,7 @@ export function Header() {
                       <span className="text-green-500 dark:text-green-400 border border-green-500 dark:border-green-400 rounded-lg px-1 py-0.5 text-xs">
                         New
                       </span>
-                    </Link> */}
+                    </Link>
                   </div>
                 </div>
 
@@ -79,30 +78,26 @@ export function Header() {
                   <span className="text-zinc-300 dark:text-zinc-700">|</span>
                   {/* <HeaderPro /> */}
                   <ThemeToggle />
-                  <Link href={"/auth/sign-in"}>
-                    <Button variant={"brand"} size={"sm"}>
-                      Get Started
-                      <ArrowUpRight className="w-4 h-4 ml-1" />
-                    </Button>
-                  </Link>
+                  <UserButton />
                 </div>
 
                 {/* Mobile Navigation remains unchanged */}
                 <div className="flex sm:hidden items-center gap-4">
+                    <Link
+                      href="https://github.com/ArunSingh-07/Nimbus/blob/main/README.md"
+                      target="_blank"
+                      className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
+                    >
+                      Docs
+                    </Link>
                   <Link
-                    href="https://github.com/ArunSingh-07/Nimbus/blob/main/README.md"
-                    target="_blank"
-                    className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
-                  >
-                    Docs
-                  </Link>
-                  {/* <Link
                     href="/pricing"
                     className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
                   >
                     API
-                  </Link> */}
+                  </Link>
                   <ThemeToggle />
+                  <UserButton />
                 </div>
               </div>
             </div>
