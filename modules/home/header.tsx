@@ -97,11 +97,11 @@ export function Header() {
                   >
                     Docs
                   </Link>
-                  <Link
-                    href="/pricing"
-                    className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
-                  >
-                    API
+                  <Link href={"/auth/sign-in"}>
+                    <Button variant={"brand"} size={"sm"}>
+                      Get Started
+                      <ArrowUpRight className="w-4 h-4 ml-1" />
+                    </Button>
                   </Link>
                   <ThemeToggle />
                 </div>

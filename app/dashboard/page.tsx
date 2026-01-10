@@ -29,12 +29,14 @@ const Page = async () => {
         {playgrounds && playgrounds.length === 0 ? (
           <EmptyState />
         ) : (
-          <ProjectTable
-            projects={playgrounds || []}
-            onDeleteProject={deleteProjectById}
-            onUpdateProject={updateProjectById}
-            onDuplicateProject={duplicateProjectById}
-          />
+          <div className="w-full overflow-x-auto">
+            <ProjectTable
+              projects={playgrounds || []}
+              onDeleteProject={deleteProjectById}
+              onUpdateProject={updateProjectById}
+              onDuplicateProject={duplicateProjectById}
+            />
+          </div>
         )}
       </div>
     </div>
