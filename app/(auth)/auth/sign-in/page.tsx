@@ -8,10 +8,18 @@ export const metadata: Metadata = {
   title: "Nimbus",
 };
 
+import Link from "next/link";
+
 const Page = () => {
   return (
     <>
-      <div className="w-screen h-screen justify-center flex items-center ">
+      <div className="w-screen h-screen justify-center flex items-center relative">
+        <div className="absolute top-10 left-10 flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
+            <Image src={"/logo.svg"} alt="Logo" height={40} width={40} />
+            <span className="font-extrabold text-lg text-white">Nimbus</span>
+          </Link>
+        </div>
         <Image
           src={"/login.svg"}
           alt="Login-Image"
