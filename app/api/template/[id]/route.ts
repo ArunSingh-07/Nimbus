@@ -1,12 +1,10 @@
 import { db } from "@/lib/db";
 import { templatePaths } from "@/lib/template";
 import {
-  readTemplateStructureFromJson,
-  saveTemplateStructureToJson,
+  scanTemplateDirectory,
 } from "@/modules/playground/lib/path-to-json";
 import { NextRequest } from "next/server";
 import path from "path";
-import fs from "fs/promises";
 
 function validateJsonStructure(data: unknown): boolean {
   try {
@@ -41,10 +39,9 @@ export async function GET(
 
   try {
     const inputPath = path.join(process.cwd(), templatePath);
-    const outputFile = path.join(process.cwd(), `output/${templateKey}.json`);
-
-    await saveTemplateStructureToJson(inputPath, outputFile);
-    const result = await readTemplateStructureFromJson(outputFile);
+    
+    // Scan directory directly in memory instead of writing to disk
+    const result = await scanTemplateDirectory(inputPath);
 
     if (!validateJsonStructure(result.items)) {
       return Response.json(
@@ -52,8 +49,6 @@ export async function GET(
         { status: 500 }
       );
     }
-
-    await fs.unlink(outputFile);
 
     return Response.json(
       { success: true, templateJson: result },
