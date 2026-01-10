@@ -18,6 +18,13 @@ export const getPlaygroundById = async (id: string) => {
       },
     });
 
+    if (playground) {
+      await db.playground.update({
+        where: { id },
+        data: { updatedAt: new Date() },
+      });
+    }
+
     return playground;
   } catch (error) {
     console.log(error);
@@ -43,6 +50,11 @@ export const SaveUpdatedCode = async (
         playgroundId,
         content: JSON.stringify(data),
       },
+    });
+
+    await db.playground.update({
+      where: { id: playgroundId },
+      data: { updatedAt: new Date() },
     });
 
     return updatedPlayground;
