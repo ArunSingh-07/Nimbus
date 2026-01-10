@@ -36,7 +36,10 @@ export default function HomeLayout({
       {/*Main*/}
       <main className="z-20 relative w-full pt-0">{children}</main>
       {/*Footer*/}
-      <Footer />
+
+      <div className="mt-4">
+        <Footer />
+      </div>
     </>
   );
 }
