@@ -4,6 +4,8 @@ import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { LogoutSynchronizer } from "@/components/logout-synchronizer";
+import MetadataCollector from "@/components/metadata-collector";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +35,7 @@ export default async function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+          <MetadataCollector />
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -40,6 +43,7 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <div className="flex flex-col min-h-screen">
+              <LogoutSynchronizer />
 
               <div className="flex-1">{children}</div>
             </div>
