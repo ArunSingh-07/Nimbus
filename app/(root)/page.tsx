@@ -10,10 +10,16 @@ export default function Home() {
   return (
     <div className=" z-20 flex flex-col items-center justify-start mt-5 px-4">
       <div className="flex flex-col justify-center items-center my-5">
-        <Image src={"/hero.svg"} alt="Hero-Section" height={500} width={500} className="w-[300px] sm:w-[500px] h-auto" />
+        <Image
+          src={"/hero.svg"}
+          alt="Hero-Section"
+          height={500}
+          width={500}
+          className="w-[300px] sm:w-[500px] h-auto"
+        />
 
         <h1 className=" z-20 text-4xl sm:text-6xl mt-5 font-extrabold text-center bg-clip-text text-transparent bg-gradient-to-r from-rose-500 via-red-500 to-pink-500 dark:from-rose-400 dark:via-red-400 dark:to-pink-400 tracking-tight leading-[1.3] ">
-          Code With with Intelligence
+          Program with Insight
         </h1>
       </div>
 
