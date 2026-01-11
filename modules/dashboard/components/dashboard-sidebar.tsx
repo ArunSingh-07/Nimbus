@@ -237,7 +237,11 @@ export function DashboardSidebar({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onClick={() => signOut()}
+                  onClick={() => {
+                    const channel = new BroadcastChannel("nimbus-auth");
+                    channel.postMessage({ type: "LOGOUT" });
+                    signOut();
+                  }}
                   className="cursor-pointer text-destructive focus:text-destructive"
                 >
                   <LogOut className="mr-2 h-4 w-4" />

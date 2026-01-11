@@ -2,7 +2,10 @@
 
 import { db } from "@/lib/db";
 import { currentUser } from "@/modules/auth/actions";
-import { revalidatePath } from "next/cache";
+import { revalidatePath } from "next/cache"; 
+import { downloadAndParseGithubRepo } from "../lib/github-loader";
+import { Templates } from "@prisma/client";
+
 
 export const toggledStarMarked = async (
   playgroundId: string,
@@ -150,9 +153,63 @@ export const duplicateProjectById = async (id: string) => {
     });
 
     revalidatePath("/dashboard");
-    return deleteProjectById;
+    return;
   } catch (error) {
     console.log(error);
     console.error("Error while duplicating Playground");
   }
 };
+
+export const importGithubProject = async (data: {
+  title: string;
+  url: string;
+  description?: string;
+}) => {
+  const user = await currentUser();
+
+  if (!user || !user.id) {
+    throw new Error("User not authenticated");
+  }
+
+  const { url, title, description } = data;
+
+  try {
+    // Get access token for private repos
+    const account = await db.account.findFirst({
+      where: {
+        userId: user.id,
+        provider: "github",
+      },
+    });
+    
+    const token = account?.accessToken;
+
+    const templateData = await downloadAndParseGithubRepo(url, token);
+
+    // Create Playground
+    const playground = await db.playground.create({
+      data: {
+        title: title,
+        description: description || `Imported from ${url}`,
+        template: Templates.GITHUB,
+        userId: user.id,
+      },
+    });
+
+    // Create TemplateFile
+    // Note: Model calls it TemplateFile, but it stores 'content: Json', which holds the structure.
+    await db.templateFile.create({
+      data: {
+        playgroundId: playground.id,
+        content: JSON.stringify(templateData),
+      },
+    });
+
+    revalidatePath("/dashboard");
+    return playground;
+  } catch (error) {
+    console.error("Error importing GitHub project:", error);
+    throw error;
+  }
+};
+

@@ -28,6 +28,7 @@ model User {
   editorTheme String @default("modern-dark")
   editorFont String @default("default")
   useColoredIcons Boolean @default(true)
+  loginHistory LoginHistory[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -62,6 +63,7 @@ enum Templates{
   VUE
   HONO
   ANGULAR
+  GITHUB
 }
 
 model Playground{
@@ -111,4 +113,21 @@ model ChatMessage{
 
   user User @relation(fields: [useId], references: [id], onDelete: Cascade)
   @@index([useId])
+}
+
+model LoginHistory {
+  id        String   @id @default(cuid()) @map("_id")
+  userId    String
+  ipAddress String?
+  userAgent String?
+  browser   String?
+  os        String?
+  deviceType String? // Desktop, Mobile, Tablet
+  screenResolution String? @default("unknown")
+  language  String?
+  timezone  String?
+  platform  String?
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
 }
