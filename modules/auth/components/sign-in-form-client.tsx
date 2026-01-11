@@ -55,7 +55,7 @@ const SignInFormClient = () => {
             Terms of Service
           </a>{" "}
           and{" "}
-          <a href="#" className="underline hover:text-primary">
+          <a href="/privacy" className="underline hover:text-primary">
             Privacy Policy
           </a>
           .
