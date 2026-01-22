@@ -898,7 +898,7 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
               <Button
                 type="submit"
                 disabled={isLoading || !input.trim()}
-                className="h-14.5 px-4 bg-zinc-600 hover:bg-zinc-700 text-white border-0 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="h-14.5 px-4 bg-zinc-600 hover:bg-zinc-700 text-white border-0 disabled:opacity-50 disabled:pointer-events-auto disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
