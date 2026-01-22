@@ -42,21 +42,18 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-
   SidebarRail,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { AllPlaygroundsDialog } from "./dialogs/all-playgrounds-dialog";
 
-// Define the interface for a single playground item, icon is now a string
 interface PlaygroundData {
   id: string;
   name: string;
-  icon: string; // Changed to string
+  icon: string;
   starred: boolean;
 }
 
-// Map icon names (strings) to their corresponding LucideIcon components
 const lucideIconMap: Record<string, LucideIcon> = {
   Zap: Zap,
   Lightbulb: Lightbulb,
@@ -64,8 +61,7 @@ const lucideIconMap: Record<string, LucideIcon> = {
   Compass: Compass,
   FlameIcon: FlameIcon,
   Terminal: Terminal,
-  Code2: Code2, // Include the default icon
-  // Add any other icons you might use dynamically
+  Code2: Code2,
 };
 
 export function DashboardSidebar({
@@ -75,20 +71,41 @@ export function DashboardSidebar({
 }) {
   const pathname = usePathname();
   const [starredPlaygrounds, setStarredPlaygrounds] = useState(
-    initialPlaygroundData?.filter((p) => p.starred)
+    initialPlaygroundData?.filter((p) => p.starred),
   );
   const [recentPlaygrounds, setRecentPlaygrounds] = useState(
-    initialPlaygroundData
+    initialPlaygroundData,
   );
   const [isAllPlaygroundsOpen, setIsAllPlaygroundsOpen] = useState(false);
 
   return (
-    <Sidebar variant="inset" collapsible="icon" className="border-1 border-r">
-      <SidebarHeader>
-        <div className="flex items-center gap-2 px-4 py-3 justify-center">
-          <Image src={"/logo.svg"} alt="logo" height={40} width={40} />
-          <div className="flex flex-col gap-0.5 leading-none">
-            <span className="font-semibold">Nimbus</span>
+    <Sidebar variant="inset" collapsible="icon" className="border border-r">
+      <SidebarHeader className="pb-2">
+        <div className="flex flex-col gap-6 px-4 py-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 outline outline-1 outline-primary/20">
+              <Image
+                src={"/logo.svg"}
+                alt="logo"
+                height={24}
+                width={24}
+                className="h-6 w-6"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold tracking-tight text-base">Nimbus</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
+                Workspace
+              </span>
+            </div>
+          </div>
+          <div className="rounded-lg bg-sidebar-accent/50 p-3 border border-sidebar-border/50">
+            <div className="flex items-start gap-2.5">
+              <div className="mt-1 h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0 animate-pulse" />
+              <p className="text-xs font-medium text-sidebar-foreground/80 leading-relaxed">
+                Hey Dev, what are we working on today?
+              </p>
+            </div>
           </div>
         </div>
       </SidebarHeader>
@@ -201,12 +218,14 @@ export function DashboardSidebar({
                     );
                   })}
               <SidebarMenuItem>
-                <SidebarMenuButton 
+                <SidebarMenuButton
                   tooltip="View all"
                   onClick={() => setIsAllPlaygroundsOpen(true)}
                 >
                   <span className="flex items-center gap-2">
-                     <span className="text-sm text-muted-foreground">View all playgrounds</span>
+                    <span className="text-sm text-muted-foreground">
+                      View all playgrounds
+                    </span>
                   </span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -224,11 +243,7 @@ export function DashboardSidebar({
                   <span>Settings</span>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="top"
-                align="start"
-                className="w-48"
-              >
+              <DropdownMenuContent side="top" align="start" className="w-48">
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/settings" className="cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
@@ -253,10 +268,10 @@ export function DashboardSidebar({
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
-      <AllPlaygroundsDialog 
-        open={isAllPlaygroundsOpen} 
+      <AllPlaygroundsDialog
+        open={isAllPlaygroundsOpen}
         onOpenChange={setIsAllPlaygroundsOpen}
-        playgrounds={initialPlaygroundData || []} 
+        playgrounds={initialPlaygroundData || []}
       />
     </Sidebar>
   );
