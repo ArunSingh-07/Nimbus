@@ -58,7 +58,7 @@ const PlaygroundEditor = ({
           model: any,
           position: any,
           context: any,
-          token: any
+          token: any,
         ) => {
           console.log("provideInlineCompletions called", {
             hasSuggestion: !!suggestion,
@@ -126,7 +126,7 @@ const PlaygroundEditor = ({
                   suggestionPosition.line,
                   suggestionPosition.column,
                   suggestionPosition.line,
-                  suggestionPosition.column
+                  suggestionPosition.column,
                 ),
                 kind: monaco.languages.CompletionItemKind.Snippet,
                 label: "AI Suggestion",
@@ -148,7 +148,7 @@ const PlaygroundEditor = ({
         },
       };
     },
-    [suggestion, suggestionPosition]
+    [suggestion, suggestionPosition],
   );
 
   // Clear current suggestion
@@ -200,7 +200,7 @@ const PlaygroundEditor = ({
 
       console.log(
         "ACCEPTING suggestion:",
-        cleanSuggestionText.substring(0, 50) + "..."
+        cleanSuggestionText.substring(0, 50) + "...",
       );
 
       // Get current cursor position to validate
@@ -222,7 +222,7 @@ const PlaygroundEditor = ({
         suggestionPos.line,
         suggestionPos.column,
         suggestionPos.line,
-        suggestionPos.column
+        suggestionPos.column,
       );
 
       // Use executeEdits to insert the text
@@ -252,7 +252,7 @@ const PlaygroundEditor = ({
 
       console.log(
         "SUCCESS: Suggestion accepted, new position:",
-        `${endLine}:${endColumn}`
+        `${endLine}:${endColumn}`,
       );
 
       // Clear the suggestion
@@ -389,11 +389,13 @@ const PlaygroundEditor = ({
     }
 
     const fontOptions = {
-        fontFamily: fontFamily === "cascadia" 
-        ? "'Cascadia Code', monospace" 
-        : defaultEditorOptions.fontFamily,
-        fontLigatures: fontFamily === "cascadia" ? true : defaultEditorOptions.fontLigatures,
-    }
+      fontFamily:
+        fontFamily === "cascadia"
+          ? "'Cascadia Code', monospace"
+          : defaultEditorOptions.fontFamily,
+      fontLigatures:
+        fontFamily === "cascadia" ? true : defaultEditorOptions.fontLigatures,
+    };
 
     editor.updateOptions({
       ...defaultEditorOptions,
@@ -430,7 +432,6 @@ const PlaygroundEditor = ({
 
     // CRITICAL: Override Tab key with high priority and prevent default Monaco behavior
 
-
     tabCommandRef.current = editor.addCommand(
       monaco.KeyCode.Tab,
       () => {
@@ -444,7 +445,7 @@ const PlaygroundEditor = ({
         // CRITICAL: Block if already processing
         if (isAcceptingSuggestionRef.current) {
           console.log(
-            "BLOCKED: Already in the process of accepting, ignoring Tab"
+            "BLOCKED: Already in the process of accepting, ignoring Tab",
           );
           return;
         }
@@ -452,7 +453,7 @@ const PlaygroundEditor = ({
         // CRITICAL: Block if just accepted
         if (suggestionAcceptedRef.current) {
           console.log(
-            "BLOCKED: Suggestion was just accepted, using default tab"
+            "BLOCKED: Suggestion was just accepted, using default tab",
           );
           editor.trigger("keyboard", "tab", null);
           return;
@@ -464,12 +465,12 @@ const PlaygroundEditor = ({
           const accepted = acceptCurrentSuggestion();
           if (accepted) {
             console.log(
-              "SUCCESS: Suggestion accepted via Tab, preventing default behavior"
+              "SUCCESS: Suggestion accepted via Tab, preventing default behavior",
             );
             return; // CRITICAL: Return here to prevent default tab behavior
           }
           console.log(
-            "FAILED: Suggestion acceptance failed, falling through to default"
+            "FAILED: Suggestion acceptance failed, falling through to default",
           );
         }
 
@@ -478,7 +479,7 @@ const PlaygroundEditor = ({
         editor.trigger("keyboard", "tab", null);
       },
       // CRITICAL: Use specific context to override Monaco's built-in Tab handling
-      "editorTextFocus && !editorReadonly && !suggestWidgetVisible"
+      "editorTextFocus && !editorReadonly && !suggestWidgetVisible",
     );
 
     // Escape to reject
@@ -587,12 +588,14 @@ const PlaygroundEditor = ({
     if (!editorRef.current) return;
 
     const fontOptions = {
-        fontFamily: fontFamily === "cascadia" 
-        ? "'Cascadia Code', monospace" 
-        : defaultEditorOptions.fontFamily,
-        fontLigatures: fontFamily === "cascadia" ? true : defaultEditorOptions.fontLigatures,
-    }
-    
+      fontFamily:
+        fontFamily === "cascadia"
+          ? "'Cascadia Code', monospace"
+          : defaultEditorOptions.fontFamily,
+      fontLigatures:
+        fontFamily === "cascadia" ? true : defaultEditorOptions.fontLigatures,
+    };
+
     editorRef.current.updateOptions(fontOptions);
   }, [fontFamily]);
 
@@ -623,9 +626,10 @@ const PlaygroundEditor = ({
         inlineCompletionProviderRef.current.dispose();
         inlineCompletionProviderRef.current = null;
       }
-
     };
   }, []);
+
+
 
   return (
     <div className="h-full relative">

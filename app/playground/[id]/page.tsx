@@ -66,9 +66,10 @@ const MainPlaygroundPage = () => {
   const [isPreviewVisible, setIsPreviewVisible] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editorTheme, setEditorTheme] = useState("modern-dark");
-  const [editorFont, setEditorFont] = useState<"default" | "cascadia">("default");
+  const [editorFont, setEditorFont] = useState<"default" | "cascadia">(
+    "default",
+  );
   const [useColoredIcons, setUseColoredIcons] = useState(true);
-
 
   // Fetch user settings on load
   useEffect(() => {
@@ -79,7 +80,8 @@ const MainPlaygroundPage = () => {
           const data = await res.json();
           if (data.editorTheme) setEditorTheme(data.editorTheme);
           if (data.editorFont) setEditorFont(data.editorFont);
-          if (data.useColoredIcons !== undefined) setUseColoredIcons(data.useColoredIcons);
+          if (data.useColoredIcons !== undefined)
+            setUseColoredIcons(data.useColoredIcons);
         }
       } catch (error) {
         console.error("Failed to fetch user settings:", error);
@@ -88,7 +90,11 @@ const MainPlaygroundPage = () => {
     fetchSettings();
   }, []);
 
-  const saveSettings = async (settings: { editorTheme?: string; editorFont?: string; useColoredIcons?: boolean }) => {
+  const saveSettings = async (settings: {
+    editorTheme?: string;
+    editorFont?: string;
+    useColoredIcons?: boolean;
+  }) => {
     try {
       await fetch("/api/user/settings", {
         method: "PUT",
@@ -114,7 +120,6 @@ const MainPlaygroundPage = () => {
     setUseColoredIcons(colored);
     saveSettings({ useColoredIcons: colored });
   };
-
 
   const { playgroundData, templateData, isLoading, error, saveTemplateData } =
     usePlayground(id);
@@ -143,8 +148,6 @@ const MainPlaygroundPage = () => {
     handleRenameFolder,
     updateFileContent,
   } = useFileExplorer();
-
-
 
   const {
     serverUrl,
@@ -175,31 +178,31 @@ const MainPlaygroundPage = () => {
         parentPath,
         writeFileSync!,
         instance,
-        saveTemplateData
+        saveTemplateData,
       );
     },
-    [handleAddFile, writeFileSync, instance, saveTemplateData]
+    [handleAddFile, writeFileSync, instance, saveTemplateData],
   );
 
   const wrappedHandleAddFolder = useCallback(
     (newFolder: TemplateFolder, parentPath: string) => {
       return handleAddFolder(newFolder, parentPath, instance, saveTemplateData);
     },
-    [handleAddFolder, instance, saveTemplateData]
+    [handleAddFolder, instance, saveTemplateData],
   );
 
   const wrappedHandleDeleteFile = useCallback(
     (file: TemplateFile, parentPath: string) => {
       return handleDeleteFile(file, parentPath, saveTemplateData);
     },
-    [handleDeleteFile, saveTemplateData]
+    [handleDeleteFile, saveTemplateData],
   );
 
   const wrappedHandleDeleteFolder = useCallback(
     (folder: TemplateFolder, parentPath: string) => {
       return handleDeleteFolder(folder, parentPath, saveTemplateData);
     },
-    [handleDeleteFolder, saveTemplateData]
+    [handleDeleteFolder, saveTemplateData],
   );
 
   const wrappedHandleRenameFile = useCallback(
@@ -207,17 +210,17 @@ const MainPlaygroundPage = () => {
       file: TemplateFile,
       newFilename: string,
       newExtension: string,
-      parentPath: string
+      parentPath: string,
     ) => {
       return handleRenameFile(
         file,
         newFilename,
         newExtension,
         parentPath,
-        saveTemplateData
+        saveTemplateData,
       );
     },
-    [handleRenameFile, saveTemplateData]
+    [handleRenameFile, saveTemplateData],
   );
 
   const wrappedHandleRenameFolder = useCallback(
@@ -226,10 +229,10 @@ const MainPlaygroundPage = () => {
         folder,
         newFolderName,
         parentPath,
-        saveTemplateData
+        saveTemplateData,
       );
     },
-    [handleRenameFolder, saveTemplateData]
+    [handleRenameFolder, saveTemplateData],
   );
 
   const activeFile = openFiles.find((file) => file.id === activeFileId);
@@ -255,13 +258,13 @@ const MainPlaygroundPage = () => {
         const filePath = findFilePath(fileToSave, latestTemplateData);
         if (!filePath) {
           toast.error(
-            `Could not find path for file: ${fileToSave.filename}.${fileToSave.fileExtension}`
+            `Could not find path for file: ${fileToSave.filename}.${fileToSave.fileExtension}`,
           );
           return;
         }
 
         const updatedTemplateData = JSON.parse(
-          JSON.stringify(latestTemplateData)
+          JSON.stringify(latestTemplateData),
         );
 
         // @ts-ignore
@@ -279,7 +282,7 @@ const MainPlaygroundPage = () => {
             return item;
           });
         updatedTemplateData.items = updateFileContent(
-          updatedTemplateData.items
+          updatedTemplateData.items,
         );
 
         // Sync with WebContainer
@@ -303,17 +306,17 @@ const MainPlaygroundPage = () => {
                 originalContent: fileToSave.content,
                 hasUnsavedChanges: false,
               }
-            : f
+            : f,
         );
         setOpenFiles(updatedOpenFiles);
 
         toast.success(
-          `Saved ${fileToSave.filename}.${fileToSave.fileExtension}`
+          `Saved ${fileToSave.filename}.${fileToSave.fileExtension}`,
         );
       } catch (error) {
         console.error("Error saving file:", error);
         toast.error(
-          `Failed to save ${fileToSave.filename}.${fileToSave.fileExtension}`
+          `Failed to save ${fileToSave.filename}.${fileToSave.fileExtension}`,
         );
         throw error;
       }
@@ -326,7 +329,7 @@ const MainPlaygroundPage = () => {
       saveTemplateData,
       setTemplateData,
       setOpenFiles,
-    ]
+    ],
   );
 
   const handleSaveAll = async () => {
@@ -412,8 +415,6 @@ const MainPlaygroundPage = () => {
     );
   }
 
-
-
   return (
     <TooltipProvider>
       <div className="contents font-google-sans">
@@ -489,7 +490,7 @@ const MainPlaygroundPage = () => {
                       onChange={(e) => {
                         const [name, source] = e.target.value.split("|");
                         const model = models.find(
-                          (m) => m.name === name && m.source === source
+                          (m) => m.name === name && m.source === source,
                         );
                         if (model) setSelectedModel(model);
                       }}

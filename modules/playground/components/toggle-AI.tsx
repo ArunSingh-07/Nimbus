@@ -61,7 +61,7 @@ const ToggleAI: React.FC<ToggleAIProps> = ({
   const handleInsertCode = (
     code: string,
     fileName?: string,
-    position?: { line: number; column: number }
+    position?: { line: number; column: number },
   ) => {
     // TODO: Implement actual code insertion logic
     // For now, just log the code and info
@@ -90,7 +90,7 @@ const ToggleAI: React.FC<ToggleAIProps> = ({
               isEnabled
                 ? "bg-zinc-900 hover:bg-zinc-800 text-zinc-50 border-zinc-800 dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:text-zinc-900 dark:border-zinc-200"
                 : "bg-background hover:bg-accent text-foreground border-border",
-              suggestionLoading && "opacity-75"
+              suggestionLoading && "opacity-75",
             )}
             onClick={(e) => e.preventDefault()}
           >
@@ -119,7 +119,7 @@ const ToggleAI: React.FC<ToggleAIProps> = ({
                 "text-xs",
                 isEnabled
                   ? "bg-zinc-900 text-zinc-50 border-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:border-zinc-200"
-                  : "bg-muted text-muted-foreground"
+                  : "bg-muted text-muted-foreground",
               )}
             >
               {isEnabled ? "Active" : "Inactive"}
@@ -165,13 +165,13 @@ const ToggleAI: React.FC<ToggleAIProps> = ({
                   "w-8 h-4 rounded-full border transition-all duration-200 relative",
                   isEnabled
                     ? "bg-zinc-900 border-zinc-900 dark:bg-zinc-50 dark:border-zinc-50"
-                    : "bg-muted border-border"
+                    : "bg-muted border-border",
                 )}
               >
                 <div
                   className={cn(
                     "w-3 h-3 rounded-full bg-background transition-all duration-200 absolute top-0.5",
-                    isEnabled ? "left-4" : "left-0.5"
+                    isEnabled ? "left-4" : "left-0.5",
                   )}
                 />
               </div>
