@@ -10,6 +10,17 @@ Located in the left sidebar, the AI Chat allows you to converse with LLMs about 
 - **Code Highlighting**: Code blocks in responses are syntax-highlighted.
 - **Context Aware**: The chat can be expanded to include code context (planned feature).
 
+### AI Controls
+
+Located in the playground header, the **AI Button** (Bot icon) manages AI features:
+
+- **Status Indicator**:
+  - 🟢 **Green Pulse**: AI features are Active.
+  - 🔴 **Red Pulse**: AI features are Inactive.
+- **Dropdown Menu**:
+  - **Enable/Disable AI**: Toggle all AI assistance features.
+  - **Open Chat**: Opens the AI Chat Sidebar interaction panel.
+
 ## Code Playground
 
 The core of Nimbus is the Code Playground, where you can write and execute code.
