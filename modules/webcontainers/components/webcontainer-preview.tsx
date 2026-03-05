@@ -7,7 +7,22 @@ import { CheckCircle, Loader2, XCircle, Terminal } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 import { WebContainer } from "@webcontainer/api";
-import { TemplateFolder } from "@/modules/playground/lib/path-to-json";
+import { TemplateFolder, TemplateFile } from "@/modules/playground/lib/path-to-json";
+import { findFilePath } from "@/modules/playground/lib";
+import { RefreshCw, ExternalLink, Monitor, Tablet, Smartphone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Dynamically import TerminalComponent with SSR disabled
 const TerminalComponent = dynamic(() => import("./terminal"), {
@@ -39,6 +54,7 @@ interface WebContainerPreviewProps {
   instance: WebContainer | null;
   writeFileSync: (path: string, content: string) => Promise<void>;
   forceResetup?: boolean;
+  activeFile?: TemplateFile;
 }
 
 const WebContainerPreview = ({
@@ -49,6 +65,7 @@ const WebContainerPreview = ({
   serverUrl,
   writeFileSync,
   forceResetup = false,
+  activeFile,
 }: WebContainerPreviewProps) => {
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [loadingState, setLoadingState] = useState({
@@ -64,7 +81,43 @@ const WebContainerPreview = ({
   const [isSetupComplete, setIsSetupComplete] = useState(false);
   const [isSetupInProgress, setIsSetupInProgress] = useState(false);
 
+  const [routeMode, setRouteMode] = useState<"base" | "activeFile" | "custom">("base");
+  const [customRoute, setCustomRoute] = useState<string>("/");
+  const [viewportSize, setViewportSize] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const terminalRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (routeMode === "activeFile" && activeFile && templateData) {
+      const path = findFilePath(activeFile, templateData);
+      if (path) {
+        let resolvedRoute = "/";
+        if (path.startsWith("app/") || path.startsWith("pages/")) {
+          resolvedRoute = "/" + path
+            .replace(/^app\//, "")
+            .replace(/^pages\//, "")
+            .replace(/\/page\.(tsx|jsx|ts|js)$/, "")
+            .replace(/page\.(tsx|jsx|ts|js)$/, "")
+            .replace(/\.(tsx|jsx|ts|js)$/, "");
+          if (resolvedRoute === "") resolvedRoute = "/";
+        } else if (path.startsWith("public/")) {
+          resolvedRoute = "/" + path.replace(/^public\//, "");
+        } else if (path.endsWith(".html")) {
+          // Fallback for raw HTML files
+          resolvedRoute = "/" + path;
+        }
+        setCustomRoute(resolvedRoute.startsWith("/") ? resolvedRoute : `/${resolvedRoute}`);
+      }
+    }
+  }, [activeFile, routeMode, templateData]);
+
+  const handleRefresh = () => {
+    if (iframeRef.current) {
+      iframeRef.current.src = iframeRef.current.src;
+    }
+  };
+
+  const fullPreviewUrl = previewUrl ? `${previewUrl.replace(/\/$/, "")}${customRoute === "/" ? "" : customRoute}` : "";
 
   // Reset setup state when forceResetup changes
   useEffect(() => {
@@ -221,7 +274,7 @@ const WebContainerPreview = ({
         // Detect script to run
         const pkgJSON = await instance.fs.readFile("package.json", "utf-8");
         const pkg = JSON.parse(pkgJSON);
-        const startScript = pkg.scripts?.start ? "start" : "dev";
+        const startScript = pkg.scripts?.dev ? "dev" : (pkg.scripts?.start ? "start" : "dev");
 
 
         if (terminalRef.current?.writeToTerminal) {
@@ -381,16 +434,120 @@ const WebContainerPreview = ({
           </div>
         </div>
       ) : (
-        <div className="h-full flex flex-col">
-          <div className="flex-1">
-            <iframe
-              src={previewUrl}
-              className="w-full h-full border-none"
-              title="WebContainer Preview"
-            />
+        <div className="h-full flex flex-col bg-background overflow-hidden">
+          {/* Mini Browser Toolbar */}
+          <div className="flex items-center justify-between px-3 py-2 border-b bg-muted/40 gap-2 shrink-0 overflow-hidden">
+            <div className="flex items-center gap-1 shrink-0">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleRefresh}>
+                      <RefreshCw className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Refresh Preview</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-7 text-xs font-medium px-2">
+                    {routeMode === "base" && "Base Route"}
+                    {routeMode === "activeFile" && "Sync with File"}
+                    {routeMode === "custom" && "Custom Route"}
+                    <span className="ml-1 text-[10px]">▼</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem onClick={() => { setRouteMode("base"); setCustomRoute("/"); }}>
+                    Base Route (/)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setRouteMode("activeFile")}>
+                    Sync with Active File
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setRouteMode("custom")}>
+                    Custom Route
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Address Bar */}
+            <div className="flex-1 min-w-0 max-w-lg mx-auto flex items-center bg-background border rounded-md px-2 h-7 focus-within:ring-1 focus-within:ring-ring">
+              <span className="text-muted-foreground text-xs mr-1 truncate hidden sm:inline max-w-[150px] md:max-w-xs">{previewUrl.replace(/\/$/, "")}</span>
+              <input
+                className="flex-1 bg-transparent border-none outline-none text-xs text-foreground min-w-[50px] font-mono"
+                value={customRoute}
+                onChange={(e) => {
+                  setRouteMode("custom");
+                  let val = e.target.value;
+                  if (!val.startsWith("/")) val = "/" + val;
+                  setCustomRoute(val);
+                }}
+                placeholder="/"
+              />
+            </div>
+
+            {/* Viewport Toggles and External Link */}
+            <div className="flex items-center gap-1 shrink-0">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className={`h-7 w-7 ${viewportSize === "mobile" ? "bg-muted" : ""}`} onClick={() => setViewportSize("mobile")}>
+                      <Smartphone className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Mobile View</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className={`h-7 w-7 ${viewportSize === "tablet" ? "bg-muted" : ""}`} onClick={() => setViewportSize("tablet")}>
+                      <Tablet className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Tablet View</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className={`h-7 w-7 ${viewportSize === "desktop" ? "bg-muted" : ""}`} onClick={() => setViewportSize("desktop")}>
+                      <Monitor className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Desktop View</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <div className="w-px h-4 bg-border mx-1"></div>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => window.open(fullPreviewUrl, '_blank')}>
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Open in New Tab</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
 
-          <div className="h-64 border-t">
+          <div className="flex-1 relative bg-muted/20 flex items-center justify-center overflow-auto">
+            <div className={`transition-all duration-300 ease-in-out bg-background ${
+              viewportSize === 'mobile' ? 'w-[375px] h-[812px] rounded-[2rem] border-[min(1rem,4vw)] border-slate-800 shadow-xl my-4 shrink-0' : 
+              viewportSize === 'tablet' ? 'w-[768px] h-[1024px] rounded-lg border border-border shadow-lg my-4 shrink-0' : 
+              'w-full h-full border-none'
+            }`}>
+              <iframe
+                ref={iframeRef}
+                src={fullPreviewUrl}
+                className={`w-full h-full border-none ${viewportSize !== 'desktop' ? 'rounded-md' : ''}`}
+                title="WebContainer Preview"
+              />
+            </div>
+          </div>
+
+          <div className="h-48 border-t shrink-0">
             <TerminalComponent
               ref={terminalRef}
               webContainerInstance={instance}

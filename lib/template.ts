@@ -5,4 +5,6 @@ export const templatePaths = {
   VUE: "/framework-starters/vue",
   HONO: "/framework-starters/hono-nodejs-starter",
   ANGULAR: "/framework-starters/angular",
+  PYTHON: "/framework-starters/python-starter",
+  CPP: "/framework-starters/cpp-starter",
 };

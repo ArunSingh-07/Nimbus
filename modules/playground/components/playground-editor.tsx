@@ -291,17 +291,8 @@ const PlaygroundEditor = ({
     );
   }, []);
 
-  useEffect(() => {
-    if (!theme || !monacoRef.current) return;
+  // Theme is now handled reactively by the <Editor /> theme prop
 
-    try {
-      monacoRef.current.editor.setTheme(theme);
-
-      console.log("Monaco theme set to:", theme);
-    } catch (error) {
-      console.warn("Failed to set Monaco theme:", theme, error);
-    }
-  }, [theme]);
 
   //font family
   useEffect(() => {
@@ -383,10 +374,6 @@ const PlaygroundEditor = ({
     editorRef.current = editor;
     monacoRef.current = monaco;
     console.log("Editor instance mounted:", !!editorRef.current);
-
-    if (theme) {
-      monaco.editor.setTheme(theme);
-    }
 
     const fontOptions = {
       fontFamily:
@@ -660,6 +647,7 @@ const PlaygroundEditor = ({
             ? getEditorLanguage(activeFile.fileExtension || "")
             : "plaintext"
         }
+        theme={theme}
         // @ts-ignore
         options={defaultEditorOptions}
       />

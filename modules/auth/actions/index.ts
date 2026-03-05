@@ -32,5 +32,6 @@ export const getAccountByUserId = async (userId: string) => {
 
 export const currentUser = async () => {
   const user = await auth();
+  console.log("Current session user:", user?.user);
   return user?.user;
 };

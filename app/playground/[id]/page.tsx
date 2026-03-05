@@ -633,6 +633,7 @@ const MainPlaygroundPage = () => {
                             error={containerError}
                             serverUrl={serverUrl!}
                             forceResetup={false}
+                            activeFile={activeFile}
                           />
                         </ResizablePanel>
                       </>
