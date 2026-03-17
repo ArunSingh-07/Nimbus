@@ -49,47 +49,44 @@ Nimbus addresses these by combining **client-side sandboxed execution** with **c
 ## System Architecture
 
 ```mermaid
-graph TB
-    subgraph Browser["Browser Environment"]
-        UI["React UI Layer<br/>(Next.js App Router)"]
-        Monaco["Monaco Editor<br/>(Code Editing)"]
-        WC["WebContainer Runtime<br/>(WASM Sandbox)"]
-        Preview["Live Preview<br/>(iframe)"]
-        Terminal["Terminal Emulator<br/>(xterm.js)"]
+graph LR
+    subgraph Client ["Client (Browser)"]
+        UI["React / Next.js UI"]
+        Editor["Monaco Editor"]
+        WC["WebContainer (WASM)"]
+        Term["xterm.js Terminal"]
         
-        UI --> Monaco
-        UI --> Terminal
-        Monaco -->|"writeFile"| WC
-        WC -->|"Server URL"| Preview
-        WC -->|"stdout/stderr"| Terminal
+        UI --> Editor
+        Editor -->|"Virtual FS"| WC
+        WC -->|"stdout"| Term
     end
-    
-    subgraph Server["Next.js API Layer"]
-        Auth["NextAuth v5<br/>(OAuth + Sessions)"]
-        AIRouter["AI Request Router<br/>(Model Proxy)"]
-        GH["GitHub Import<br/>(Zipball Fetch + Parse)"]
-        DB["Prisma ORM"]
+
+    subgraph Server ["Server (Next.js)"]
+        Auth["NextAuth v5"]
+        Router["AI Request Router"]
+        GH["GitHub Service"]
+        DB[("Prisma / MongoDB")]
     end
-    
-    subgraph External["External Services"]
-        MongoDB[(MongoDB Atlas)]
-        OllamaLocal["Ollama Local<br/>(localhost:11434)"]
-        OllamaCloud["Ollama Cloud<br/>(Remote Instance)"]
-        Gemini["Google Generative AI"]
-        GitHub["GitHub API"]
+
+    subgraph Models ["AI Intelligence"]
+        Ollama["Ollama (Local/Cloud)"]
+        Gemini["Google Gemini"]
     end
-    
-    UI -->|"API Calls"| Server
-    AIRouter --> OllamaLocal
-    AIRouter --> OllamaCloud
-    AIRouter --> Gemini
-    Auth --> MongoDB
-    DB --> MongoDB
-    GH --> GitHub
-    
-    style WC fill:#ff6b35,stroke:#333,color:#fff
-    style AIRouter fill:#4a90d9,stroke:#333,color:#fff
-    style Browser fill:#1a1a2e,stroke:#16213e,color:#fff
+
+    UI -->|"API Routes"| Auth
+    UI -->|"Inference"| Router
+    Router --> Ollama
+    Router --> Gemini
+    Auth --> DB
+    UI --> GH
+
+    %% Styling
+    style WC fill:#f97316,stroke:#ea580c,color:#fff,stroke-width:2px
+    style Router fill:#3b82f6,stroke:#2563eb,color:#fff,stroke-width:2px
+    style DB fill:#10b981,stroke:#059669,color:#fff,stroke-width:2px
+    style Client fill:none,stroke:#666,stroke-dasharray: 5 5
+    style Server fill:none,stroke:#666,stroke-dasharray: 5 5
+    style Models fill:none,stroke:#666,stroke-dasharray: 5 5
 ```
 
 > For detailed architecture diagrams including sequence flows and data models, see [`docs/research/system-design.md`](docs/research/system-design.md).
