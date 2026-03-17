@@ -2,6 +2,29 @@
   "name": "nimbus",
   "version": "0.1.0",
   "private": true,
+  "description": "A browser-native code execution environment with AI-assisted development, leveraging WebContainers for in-browser Node.js execution and hybrid local/cloud LLM inference.",
+  "author": {
+    "name": "Arun Singh",
+    "email": "arunsinghjobss@gmail.com",
+    "url": "https://github.com/ArunSingh-07"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ArunSingh-07/Nimbus.git"
+  },
+  "homepage": "https://github.com/ArunSingh-07/Nimbus",
+  "keywords": [
+    "ide",
+    "webcontainers",
+    "browser-ide",
+    "code-execution",
+    "webassembly",
+    "ai-code-completion",
+    "ollama",
+    "monaco-editor",
+    "nextjs",
+    "developer-tools"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
